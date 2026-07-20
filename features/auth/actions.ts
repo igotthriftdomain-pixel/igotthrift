@@ -70,11 +70,18 @@ export async function changePasswordAction(data: ChangePasswordInput) {
   return { success: true };
 }
 
-export async function requestPasswordResetAction(data: ForgotPasswordInput, origin: string) {
+import { headers } from "next/headers";
+
+export async function requestPasswordResetAction(data: ForgotPasswordInput, clientOrigin?: string) {
   const result = forgotPasswordSchema.safeParse(data);
   if (!result.success) {
     return { success: false, error: result.error.issues[0].message };
   }
+
+  const headerList = await headers();
+  const host = headerList.get("host");
+  const proto = headerList.get("x-forwarded-proto") || "http";
+  const origin = host ? `${proto}://${host}` : clientOrigin || "http://localhost:3000";
 
   const supabase = await createClient();
   const redirectUrl = `${origin}/auth/callback?next=/reset-password`;
