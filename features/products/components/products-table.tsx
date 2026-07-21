@@ -110,7 +110,7 @@ export function ProductsTable({ products, currencySymbol }: ProductsTableProps) 
                 <TableCell className="text-zinc-400 line-through py-2.5">
                   {product.compare_at_price ? `${currencySymbol}${product.compare_at_price.toLocaleString("en-IN")}` : "—"}
                 </TableCell>
-                <TableCell className="text-center font-mono text-zinc-800 dark:text-zinc-300 py-2.5">{product.stock_quantity}</TableCell>
+                <TableCell className="text-center font-mono text-zinc-800 dark:text-zinc-300 py-2.5">{product.stock ?? product.stock_quantity ?? 0}</TableCell>
                 <TableCell className="text-center py-2.5">
                   {product.featured && <Star className="size-4 text-amber-500 fill-current mx-auto" />}
                 </TableCell>

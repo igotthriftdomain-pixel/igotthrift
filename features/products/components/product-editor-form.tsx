@@ -69,7 +69,6 @@ export function ProductEditorForm({
   // General Fields
   const [name, setName] = useState(initialProduct?.name || "");
   const [slug, setSlug] = useState(initialProduct?.slug || "");
-  const [shortDescription, setShortDescription] = useState(initialProduct?.short_description || "");
   const [description, setDescription] = useState(initialProduct?.description || "");
 
   // Pricing Fields
@@ -81,7 +80,7 @@ export function ProductEditorForm({
   // Inventory Fields
   const [sku, setSku] = useState(initialProduct?.sku || "");
   const [stockQuantity, setStockQuantity] = useState(
-    initialProduct?.stock_quantity ? initialProduct.stock_quantity.toString() : "0"
+    initialProduct?.stock !== undefined ? initialProduct.stock.toString() : (initialProduct?.stock_quantity ? initialProduct.stock_quantity.toString() : "0")
   );
 
   // Organization Fields
@@ -119,12 +118,11 @@ export function ProductEditorForm({
   const isDirty =
     name !== (initialProduct?.name || "") ||
     slug !== (initialProduct?.slug || "") ||
-    shortDescription !== (initialProduct?.short_description || "") ||
     description !== (initialProduct?.description || "") ||
     price !== (initialProduct?.price ? initialProduct.price.toString() : "") ||
     compareAtPrice !== (initialProduct?.compare_at_price ? initialProduct.compare_at_price.toString() : "") ||
     sku !== (initialProduct?.sku || "") ||
-    stockQuantity !== (initialProduct?.stock_quantity ? initialProduct.stock_quantity.toString() : "0") ||
+    stockQuantity !== (initialProduct?.stock !== undefined ? initialProduct.stock.toString() : (initialProduct?.stock_quantity ? initialProduct.stock_quantity.toString() : "0")) ||
     categoryId !== (initialProduct?.category_id || "") ||
     featured !== (initialProduct?.featured || false) ||
     active !== (initialProduct?.active ?? true);
@@ -305,12 +303,12 @@ export function ProductEditorForm({
     const validation = productSchema.safeParse({
       name,
       slug,
-      short_description: shortDescription || null,
+      short_description: null,
       description: description || null,
       price: formattedPrice,
       compare_at_price: formattedComparePrice,
       sku: sku || null,
-      stock_quantity: formattedStock,
+      stock: formattedStock,
       category_id: categoryId,
       featured,
       active,
@@ -358,7 +356,6 @@ export function ProductEditorForm({
   };
 
   const primaryImage = images.find((img) => img.is_primary)?.publicUrl || null;
-  const shortDescLeft = CHARACTER_LIMITS.shortDescription - shortDescription.length;
   const descLeft = CHARACTER_LIMITS.description - description.length;
 
   return (
@@ -454,26 +451,7 @@ export function ProductEditorForm({
 
                   <Field>
                     <FieldLabel className="text-zinc-700 dark:text-zinc-300 font-medium flex justify-between items-center">
-                      <span>Short Description</span>
-                      <span className={`text-xs ${shortDescLeft < 15 ? "text-amber-500 font-semibold" : "text-zinc-400"}`}>
-                        {shortDescLeft} characters remaining
-                      </span>
-                    </FieldLabel>
-                    <Input
-                      type="text"
-                      value={shortDescription}
-                      onChange={(e) => setShortDescription(e.target.value)}
-                      disabled={saving}
-                      className="bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-50"
-                      placeholder="Brief single-sentence tag line for previews..."
-                      aria-label="Short Description"
-                    />
-                    {errors.short_description && <FieldError className="text-red-400 text-xs mt-1">{errors.short_description}</FieldError>}
-                  </Field>
-
-                  <Field>
-                    <FieldLabel className="text-zinc-700 dark:text-zinc-300 font-medium flex justify-between items-center">
-                      <span>Full Description</span>
+                      <span>Product Description</span>
                       <span className={`text-xs ${descLeft < 50 ? "text-amber-500 font-semibold" : "text-zinc-400"}`}>
                         {descLeft} characters remaining
                       </span>
@@ -484,7 +462,7 @@ export function ProductEditorForm({
                       disabled={saving}
                       className="bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-50 min-h-[120px]"
                       placeholder="Describe styling fits, conditions, size, and wear details..."
-                      aria-label="Full Description"
+                      aria-label="Product Description"
                     />
                     {errors.description && <FieldError className="text-red-400 text-xs mt-1">{errors.description}</FieldError>}
                   </Field>
@@ -564,7 +542,7 @@ export function ProductEditorForm({
                         placeholder="5"
                         aria-label="Stock Quantity"
                       />
-                      {errors.stock_quantity && <FieldError className="text-red-400 text-xs mt-1">{errors.stock_quantity}</FieldError>}
+                      {errors.stock && <FieldError className="text-red-400 text-xs mt-1">{errors.stock}</FieldError>}
                     </Field>
                   </FieldGroup>
                 </CardContent>

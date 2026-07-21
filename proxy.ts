@@ -35,15 +35,16 @@ export async function proxy(request: NextRequest) {
 
   if (isProtectedRoute || isLoginRoute) {
     const { user, supabaseResponse } = await updateSession(request);
+    const isServerAction = request.headers.has("next-action");
 
-    // Not logged in and trying to access dashboard → redirect to login
-    if (!user && isProtectedRoute) {
+    // Not logged in and trying to access dashboard via page request → redirect to login
+    if (!user && isProtectedRoute && !isServerAction) {
       url.pathname = LOGIN_ROUTE;
       return NextResponse.redirect(url);
     }
 
     // Already logged in and trying to access login → redirect to dashboard
-    if (user && isLoginRoute) {
+    if (user && isLoginRoute && !isServerAction) {
       url.pathname = "/dashboard";
       return NextResponse.redirect(url);
     }

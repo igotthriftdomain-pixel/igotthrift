@@ -13,7 +13,8 @@ interface RawProductSelect {
   price: number;
   compare_at_price: number | null;
   sku: string | null;
-  stock_quantity: number;
+  stock?: number;
+  stock_quantity?: number;
   featured: boolean;
   active: boolean;
   published_at: string | null;
@@ -103,7 +104,7 @@ function mapProductToDTO(supabase: SupabaseClient, item: RawProductSelect): Stor
     price: item.price,
     compareAtPrice: item.compare_at_price,
     sku: item.sku,
-    stockQuantity: item.stock_quantity,
+    stockQuantity: item.stock ?? item.stock_quantity ?? 0,
     featured: item.featured,
     active: item.active,
     publishedAt: item.published_at,

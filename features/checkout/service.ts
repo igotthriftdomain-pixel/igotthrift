@@ -15,7 +15,7 @@ export async function verifyStockAndPrices(
 
   const { data: dbProducts, error } = await supabase
     .from("products")
-    .select("id, price, stock_quantity, active, deleted_at, published_at")
+    .select("id, price, stock, active, deleted_at, published_at")
     .in("id", productIds)
     .eq("store_id", storeId);
 
@@ -36,8 +36,9 @@ export async function verifyStockAndPrices(
       return { success: false, error: `Product "${item.name}" is no longer available.` };
     }
 
-    if (dbProduct.stock_quantity < item.quantity) {
-      return { success: false, error: `Product "${item.name}" only has ${dbProduct.stock_quantity} items left in stock.` };
+    const availableStock = dbProduct.stock ?? 0;
+    if (availableStock < item.quantity) {
+      return { success: false, error: `Product "${item.name}" only has ${availableStock} items left in stock.` };
     }
 
     recalculatedSubtotal += dbProduct.price * item.quantity;
@@ -77,15 +78,15 @@ export async function createOrderRecord(
   for (const item of items) {
     const { data: currentProduct } = await supabase
       .from("products")
-      .select("stock_quantity")
+      .select("stock")
       .eq("id", item.id)
       .maybeSingle();
       
     if (currentProduct) {
-      const newStock = Math.max(0, currentProduct.stock_quantity - item.quantity);
+      const newStock = Math.max(0, currentProduct.stock - item.quantity);
       await supabase
         .from("products")
-        .update({ stock_quantity: newStock })
+        .update({ stock: newStock })
         .eq("id", item.id);
     }
   }

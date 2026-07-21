@@ -11,7 +11,8 @@ export interface Product {
   price: number;
   compare_at_price: number | null;
   sku: string | null;
-  stock_quantity: number;
+  stock: number;
+  stock_quantity?: number;
   featured: boolean;
   active: boolean;
   published_at: string | null;

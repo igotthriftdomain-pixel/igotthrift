@@ -85,7 +85,7 @@ export async function getProducts(
     } else if (filters.sort === "price_desc") {
       query = query.order("price", { ascending: false });
     } else if (filters.sort === "stock_asc") {
-      query = query.order("stock_quantity", { ascending: true });
+      query = query.order("stock", { ascending: true });
     } else {
       query = query.order("created_at", { ascending: false });
     }
@@ -144,42 +144,41 @@ export async function getProductById(
   return product;
 }
 
-export async function createProduct(storeId: string, productId: string, data: ProductInput) {
-  const supabase = await createClient();
-  const normalizedSlug = normalizeSlug(data.slug || data.name);
+export async function generateUniqueSlug(
+  storeId: string,
+  baseSlug: string,
+  excludeId?: string
+): Promise<string> {
+  let candidateSlug = baseSlug;
+  let count = 1;
 
-  const exists = await checkSlugExists(storeId, normalizedSlug);
-  if (exists) {
-    throw new Error("duplicate_slug");
+  while (await checkSlugExists(storeId, candidateSlug, excludeId)) {
+    candidateSlug = `${baseSlug}-${count}`;
+    count++;
   }
 
-  // Get max sort_order
-  const { data: maxSortData } = await supabase
-    .from("products")
-    .select("sort_order")
-    .eq("store_id", storeId)
-    .order("sort_order", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  return candidateSlug;
+}
 
-  const nextSortOrder = maxSortData ? maxSortData.sort_order + 1 : 0;
+export async function createProduct(storeId: string, productId: string, data: ProductInput) {
+  const supabase = await createClient();
+  const rawSlug = normalizeSlug(data.slug || data.name);
+  const finalSlug = await generateUniqueSlug(storeId, rawSlug);
 
   const { error: productError } = await supabase.from("products").insert({
     id: productId,
     store_id: storeId,
     category_id: data.category_id,
     name: data.name.trim(),
-    slug: normalizedSlug,
-    short_description: data.short_description ? data.short_description.trim() : null,
+    slug: finalSlug,
     description: data.description ? data.description.trim() : null,
     price: data.price,
     compare_at_price: data.compare_at_price ?? null,
     sku: data.sku ? data.sku.trim() : null,
-    stock_quantity: data.stock_quantity,
+    stock: data.stock,
     featured: data.featured,
     active: data.active,
     published_at: data.published_at || null,
-    sort_order: nextSortOrder,
   });
 
   if (productError) throw new Error(productError.message);
@@ -190,7 +189,6 @@ export async function createProduct(storeId: string, productId: string, data: Pr
       product_id: productId,
       storage_path: img.storage_path,
       display_order: img.display_order,
-      is_primary: img.is_primary,
     }));
 
     const { error: imagesError } = await supabase.from("product_images").insert(imagesToInsert);
@@ -200,25 +198,20 @@ export async function createProduct(storeId: string, productId: string, data: Pr
 
 export async function updateProduct(storeId: string, productId: string, data: ProductInput) {
   const supabase = await createClient();
-  const normalizedSlug = normalizeSlug(data.slug || data.name);
-
-  const exists = await checkSlugExists(storeId, normalizedSlug, productId);
-  if (exists) {
-    throw new Error("duplicate_slug");
-  }
+  const rawSlug = normalizeSlug(data.slug || data.name);
+  const finalSlug = await generateUniqueSlug(storeId, rawSlug, productId);
 
   const { error: productError } = await supabase
     .from("products")
     .update({
       category_id: data.category_id,
       name: data.name.trim(),
-      slug: normalizedSlug,
-      short_description: data.short_description ? data.short_description.trim() : null,
+      slug: finalSlug,
       description: data.description ? data.description.trim() : null,
       price: data.price,
       compare_at_price: data.compare_at_price ?? null,
       sku: data.sku ? data.sku.trim() : null,
-      stock_quantity: data.stock_quantity,
+      stock: data.stock,
       featured: data.featured,
       active: data.active,
       published_at: data.published_at || null,
@@ -241,7 +234,6 @@ export async function updateProduct(storeId: string, productId: string, data: Pr
       product_id: productId,
       storage_path: img.storage_path,
       display_order: img.display_order,
-      is_primary: img.is_primary,
     }));
 
     const { error: imagesError } = await supabase.from("product_images").insert(imagesToInsert);
