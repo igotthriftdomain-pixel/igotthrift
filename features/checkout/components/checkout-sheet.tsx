@@ -51,7 +51,7 @@ export function CheckoutSheet({ store }: { store: StorefrontDetails }) {
         fieldErrors[path] = err.message;
       });
       setErrors(fieldErrors);
-      toast.error("Please correct checkout errors.");
+      toast.error(validation.error.issues[0]?.message || "Please fill in all required checkout fields.");
       return;
     }
 
