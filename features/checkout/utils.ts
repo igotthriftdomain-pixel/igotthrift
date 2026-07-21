@@ -22,18 +22,30 @@ ${itemList}
 
 Total: ${currencySymbol}${subtotal.toLocaleString("en-IN")}
 
-Customer Details
+Customer Details:
 Name: ${details.name}
 Phone: ${details.phone}
 Address: ${details.address}
 
-Thank you.`;
+Thank you!`;
 
   return message;
 }
 
 export function generateWhatsAppLink(whatsappNumber: string, message: string): string {
-  // Normalize number (strip symbols)
-  const normalizedNumber = whatsappNumber.replace(/[^0-9]/g, "");
-  return `https://wa.me/${normalizedNumber}?text=${encodeURIComponent(message)}`;
+  // Strip all non-numeric characters
+  let cleanNumber = whatsappNumber.replace(/[^0-9]/g, "");
+
+  // Strip leading zero if present (e.g., 09876543210 -> 9876543210)
+  if (cleanNumber.startsWith("0")) {
+    cleanNumber = cleanNumber.substring(1);
+  }
+
+  // Prepend 91 for 10-digit Indian numbers without country code
+  if (cleanNumber.length === 10) {
+    cleanNumber = `91${cleanNumber}`;
+  }
+
+  // api.whatsapp.com/send guarantees opening the specific merchant recipient chat on WhatsApp Desktop & Web
+  return `https://api.whatsapp.com/send?phone=${cleanNumber}&text=${encodeURIComponent(message)}`;
 }
