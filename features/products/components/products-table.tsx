@@ -72,7 +72,7 @@ export function ProductsTable({ products, currencySymbol }: ProductsTableProps) 
   };
 
   return (
-    <div className="border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden bg-white dark:bg-zinc-950 shadow-sm">
+    <div className="border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-x-auto bg-white dark:bg-zinc-950 shadow-sm">
       <Table>
         <TableHeader className="bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
           <TableRow>

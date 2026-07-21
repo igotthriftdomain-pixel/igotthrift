@@ -101,7 +101,7 @@ export function ProductsView({
       {/* Header and Add Button */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         {/* Search bar */}
-        <div className="relative max-w-sm flex-1">
+        <div className="relative w-full md:max-w-sm flex-1">
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-400" />
           <Input
             placeholder="Search products by name, slug or SKU..."
@@ -122,7 +122,7 @@ export function ProductsView({
             href="/products/new"
             className={cn(
               buttonVariants({ variant: "default" }),
-              "bg-zinc-900 hover:bg-zinc-800 text-zinc-50 dark:bg-zinc-50 dark:hover:bg-zinc-205 dark:text-zinc-950 font-semibold h-10 flex gap-1.5 items-center justify-center px-4 rounded-lg text-sm"
+              "bg-zinc-900 hover:bg-zinc-800 text-zinc-50 dark:bg-zinc-50 dark:hover:bg-zinc-205 dark:text-zinc-950 font-semibold h-10 flex gap-1.5 items-center justify-center px-4 rounded-lg text-sm w-full sm:w-auto"
             )}
           >
             <Plus className="size-4" /> Add Product
@@ -132,9 +132,9 @@ export function ProductsView({
 
       {/* Filters Toolbar */}
       {!showEmptyState && (
-        <div className="flex flex-wrap gap-3 items-center bg-zinc-50/50 dark:bg-zinc-950/20 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 items-center bg-zinc-50/50 dark:bg-zinc-950/20 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800">
           {/* Category Filter */}
-          <div className="w-44">
+          <div className="w-full">
             <Select value={category} onValueChange={(val) => updateParam("category", val || "all")}>
               <SelectTrigger className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
                 <SelectValue placeholder="All Categories" />
@@ -151,7 +151,7 @@ export function ProductsView({
           </div>
 
           {/* Status Filter */}
-          <div className="w-36">
+          <div className="w-full">
             <Select value={status} onValueChange={(val) => updateParam("status", val || "all")}>
               <SelectTrigger className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
                 <SelectValue placeholder="All Status" />
@@ -166,7 +166,7 @@ export function ProductsView({
           </div>
 
           {/* Featured Filter */}
-          <div className="w-36">
+          <div className="w-full">
             <Select value={featured} onValueChange={(val) => updateParam("featured", val || "all")}>
               <SelectTrigger className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
                 <SelectValue placeholder="All Featured" />
@@ -179,7 +179,7 @@ export function ProductsView({
           </div>
 
           {/* Sorting */}
-          <div className="w-44 ml-auto">
+          <div className="w-full">
             <Select value={sort} onValueChange={(val) => updateParam("sort", val || "created_desc")}>
               <SelectTrigger className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
                 <SelectValue placeholder="Sort By" />
