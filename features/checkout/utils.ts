@@ -34,18 +34,18 @@ Thank you!`;
 
 export function generateWhatsAppLink(whatsappNumber: string, message: string): string {
   // Strip all non-numeric characters
-  let cleanNumber = whatsappNumber.replace(/[^0-9]/g, "");
+  let cleanNumber = whatsappNumber.replace(/\D/g, "");
 
-  // Strip leading zero if present (e.g., 09876543210 -> 9876543210)
-  if (cleanNumber.startsWith("0")) {
-    cleanNumber = cleanNumber.substring(1);
-  }
+  // Strip leading zero if present
+  cleanNumber = cleanNumber.replace(/^0+/, "");
 
   // Prepend 91 for 10-digit Indian numbers without country code
   if (cleanNumber.length === 10) {
     cleanNumber = `91${cleanNumber}`;
   }
 
-  // api.whatsapp.com/send guarantees opening the specific merchant recipient chat on WhatsApp Desktop & Web
-  return `https://api.whatsapp.com/send?phone=${cleanNumber}&text=${encodeURIComponent(message)}`;
+  const encodedMsg = encodeURIComponent(message);
+
+  // Official wa.me short link format with recipient number and encoded message text
+  return `https://wa.me/${cleanNumber}?text=${encodedMsg}`;
 }

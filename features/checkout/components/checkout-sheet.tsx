@@ -55,6 +55,9 @@ export function CheckoutSheet({ store }: { store: StorefrontDetails }) {
       return;
     }
 
+    // Open tab synchronously in response to user click to prevent desktop pop-up blockers from dropping recipient URL query parameters
+    const targetTab = typeof window !== "undefined" ? window.open("about:blank", "_blank") : null;
+
     setLoading(true);
     try {
       const res = await checkoutAction(store.id, store.slug, details, items);
@@ -62,13 +65,18 @@ export function CheckoutSheet({ store }: { store: StorefrontDetails }) {
         toast.success("Order recorded! Opening WhatsApp...");
         clearCart();
         setOpen(false);
-        if (typeof window !== "undefined") {
-          window.open(res.whatsappUrl, "_blank");
+
+        if (targetTab) {
+          targetTab.location.href = res.whatsappUrl;
+        } else if (typeof window !== "undefined") {
+          window.location.href = res.whatsappUrl;
         }
       } else {
+        if (targetTab) targetTab.close();
         toast.error(res.error);
       }
     } catch (err) {
+      if (targetTab) targetTab.close();
       console.error(err);
       toast.error("An unexpected error occurred. Please try again.");
     } finally {
