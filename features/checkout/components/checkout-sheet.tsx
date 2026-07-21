@@ -19,7 +19,7 @@ import { type CheckoutDetails } from "../types";
 import { checkoutSchema } from "../schema";
 import { checkoutAction } from "../actions";
 import { toast } from "sonner";
-import { Send, ArrowLeft, Loader2 } from "lucide-react";
+import { Send, ArrowLeft, Loader2, MessageSquareCode } from "lucide-react";
 
 export function CheckoutSheet({ store }: { store: StorefrontDetails }) {
   const { items, subtotal, clearCart } = useCart();
@@ -79,21 +79,21 @@ export function CheckoutSheet({ store }: { store: StorefrontDetails }) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
-        className="w-full h-11 inline-flex items-center justify-center rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-xs tracking-wide transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-green-400"
+        className="w-full h-12 inline-flex items-center justify-center rounded-xl bg-[#F36B00] hover:bg-[#e06200] text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer focus:outline-hidden active:scale-98"
         aria-label="Proceed to checkout sheet"
       >
-        <Send className="size-4 fill-current" />
+        <MessageSquareCode className="size-4" />
         <span>Checkout with WhatsApp</span>
       </SheetTrigger>
 
-      <SheetContent className="w-full sm:max-w-md flex flex-col h-full bg-white dark:bg-zinc-950 p-0 border-l border-zinc-200 dark:border-zinc-800">
-        <SheetHeader className="p-6 border-b border-zinc-150 dark:border-zinc-900 flex flex-row items-center justify-between">
+      <SheetContent className="w-full sm:max-w-md flex flex-col h-full bg-[#FAF8F3] dark:bg-[#0A0A0A] p-0 border-l border-[#E8E2D8] dark:border-zinc-800">
+        <SheetHeader className="p-6 border-b border-[#E8E2D8] dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-row items-center justify-between">
           <div className="space-y-0.5 text-left">
-            <SheetTitle className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
-              Checkout Details
+            <SheetTitle className="text-lg font-black text-[#0A0A0A] dark:text-[#FAF8F3] uppercase tracking-tight">
+              Customer Details
             </SheetTitle>
-            <SheetDescription className="text-xs text-zinc-400 dark:text-zinc-500">
-              Provide delivery details to submit order
+            <SheetDescription className="text-xs text-zinc-500 font-medium">
+              Provide delivery details to submit your WhatsApp order
             </SheetDescription>
           </div>
         </SheetHeader>
@@ -115,26 +115,26 @@ export function CheckoutSheet({ store }: { store: StorefrontDetails }) {
             />
           </div>
 
-          <div className="space-y-2 pt-6">
+          <div className="space-y-2.5 pt-6 border-t border-[#E8E2D8] dark:border-zinc-800">
             <Button
               type="submit"
               disabled={loading || items.length === 0}
-              className="w-full h-11 rounded-xl bg-[var(--store-theme)] hover:bg-[var(--store-theme-hover)] text-white font-bold text-xs tracking-wide transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full h-12 rounded-xl bg-[#F36B00] hover:bg-[#e06200] text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-98 border-0"
             >
               {loading ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  <span>Processing Checkout...</span>
+                  <span>Processing Order...</span>
                 </>
               ) : (
                 <>
                   <Send className="size-4 fill-current" />
-                  <span>Confirm Order & Redirect</span>
+                  <span>Confirm Order & Open WhatsApp</span>
                 </>
               )}
             </Button>
 
-            <SheetClose className="w-full h-11 inline-flex items-center justify-center rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 bg-transparent hover:bg-zinc-50 dark:hover:bg-zinc-900 font-semibold text-xs tracking-wide cursor-pointer transition-all">
+            <SheetClose className="w-full h-10 inline-flex items-center justify-center rounded-xl border border-[#E8E2D8] dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-[#F3EFE7] dark:hover:bg-zinc-800 font-extrabold text-xs uppercase tracking-wider cursor-pointer transition-all">
               <ArrowLeft className="size-3.5 mr-1.5" /> Back to Cart
             </SheetClose>
           </div>

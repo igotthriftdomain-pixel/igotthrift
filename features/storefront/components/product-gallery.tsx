@@ -29,7 +29,7 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
 
   if (images.length === 0) {
     return (
-      <div className="aspect-square w-full rounded-xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-zinc-400">
+      <div className="aspect-square w-full rounded-2xl bg-[#F3EFE7] dark:bg-zinc-900 border border-[#E8E2D8] dark:border-zinc-800 flex items-center justify-center text-zinc-300">
         <ShoppingBag className="size-16" />
       </div>
     );
@@ -39,13 +39,13 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
 
   return (
     <div className="space-y-4">
-      {/* Primary Display Frame */}
-      <div className="relative aspect-square rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center group">
+      {/* Primary Display Frame with 4:5 aspect ratio */}
+      <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-[#E8E2D8] dark:border-zinc-800 bg-[#F3EFE7] dark:bg-zinc-950 flex items-center justify-center group shadow-xs">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={activeImage.publicUrl}
-          alt={`Product view ${activeIndex + 1}`}
-          className="w-full h-full object-cover"
+          alt={`Product drop view ${activeIndex + 1}`}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
         {/* Carousel overlay arrow triggers (Only if > 1 image) */}
@@ -54,7 +54,7 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
             <Button
               variant="outline"
               size="icon"
-              className="absolute left-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity size-8 rounded-full border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/90 text-zinc-900 dark:text-zinc-50 cursor-pointer shadow-md"
+              className="absolute left-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity size-9 rounded-full border-[#E8E2D8] bg-white/95 dark:bg-[#0A0A0A]/95 text-[#0A0A0A] dark:text-[#FAF8F3] cursor-pointer shadow-md"
               onClick={() => setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
               aria-label="Previous image"
             >
@@ -63,7 +63,7 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
             <Button
               variant="outline"
               size="icon"
-              className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity size-8 rounded-full border-zinc-200 dark:border-zinc-800 bg-white/90 dark:bg-zinc-900/90 text-zinc-900 dark:text-zinc-50 cursor-pointer shadow-md"
+              className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity size-9 rounded-full border-[#E8E2D8] bg-white/95 dark:bg-[#0A0A0A]/95 text-[#0A0A0A] dark:text-[#FAF8F3] cursor-pointer shadow-md"
               onClick={() => setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
               aria-label="Next image"
             >
@@ -80,10 +80,10 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
             <button
               key={img.storagePath}
               onClick={() => setActiveIndex(idx)}
-              className={`relative size-16 shrink-0 rounded-lg overflow-hidden border-2 cursor-pointer transition-all focus:outline-hidden focus:ring-2 focus:ring-[var(--store-theme)] ${
+              className={`relative size-20 shrink-0 rounded-xl overflow-hidden border-2 cursor-pointer transition-all ${
                 idx === activeIndex
-                  ? "border-[var(--store-theme)]"
-                  : "border-zinc-200 dark:border-zinc-800 hover:border-zinc-400"
+                  ? "border-[#FFBC0A] ring-2 ring-[#FFBC0A]/40"
+                  : "border-[#E8E2D8] dark:border-zinc-800 opacity-70 hover:opacity-100"
               }`}
               aria-label={`View image thumbnail ${idx + 1}`}
             >

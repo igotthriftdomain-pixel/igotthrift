@@ -10,7 +10,13 @@ import {
   removeLogoAction,
   removeBannerAction,
 } from "../actions";
-import { CHARACTER_LIMITS, ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from "../constants";
+import {
+  CHARACTER_LIMITS,
+  ALLOWED_IMAGE_TYPES,
+  ALLOWED_BANNER_TYPES,
+  MAX_FILE_SIZE,
+  MAX_BANNER_FILE_SIZE,
+} from "../constants";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -25,6 +31,7 @@ import {
   Sparkles,
   Eye,
   AlertTriangle,
+  Video,
 } from "lucide-react";
 
 const InstagramIcon = ({ className }: { className?: string }) => (
@@ -62,13 +69,17 @@ const FacebookIcon = ({ className }: { className?: string }) => (
 interface StoreSettingsFormProps {
   initialStore: Store;
   initialLogoUrl: string | null;
-  initialBannerUrl: string | null;
+  initialBannerUrl?: string | null;
+  initialBannerUrl1?: string | null;
+  initialBannerUrl2?: string | null;
 }
 
 export function StoreSettingsForm({
   initialStore,
   initialLogoUrl,
   initialBannerUrl,
+  initialBannerUrl1,
+  initialBannerUrl2,
 }: StoreSettingsFormProps) {
   const router = useRouter();
 
@@ -86,9 +97,14 @@ export function StoreSettingsForm({
 
   // Image Upload / Preview States
   const [logoPreview, setLogoPreview] = useState<string | null>(initialLogoUrl);
-  const [bannerPreview, setBannerPreview] = useState<string | null>(initialBannerUrl);
+  const [bannerPreview1, setBannerPreview1] = useState<string | null>(
+    initialBannerUrl1 || initialBannerUrl || null
+  );
+  const [bannerPreview2, setBannerPreview2] = useState<string | null>(initialBannerUrl2 || null);
+
   const [logoUploading, setLogoUploading] = useState(false);
-  const [bannerUploading, setBannerUploading] = useState(false);
+  const [banner1Uploading, setBanner1Uploading] = useState(false);
+  const [banner2Uploading, setBanner2Uploading] = useState(false);
 
   // Form Submission / Saving States
   const [saving, setSaving] = useState(false);
@@ -96,7 +112,20 @@ export function StoreSettingsForm({
 
   // File Inputs references
   const logoInputRef = useRef<HTMLInputElement>(null);
-  const bannerInputRef = useRef<HTMLInputElement>(null);
+  const banner1InputRef = useRef<HTMLInputElement>(null);
+  const banner2InputRef = useRef<HTMLInputElement>(null);
+
+  // Helper to detect video format for preview
+  const isVideoUrl = (url: string | null) => {
+    if (!url) return false;
+    const clean = url.split("?")[0].toLowerCase();
+    return (
+      clean.endsWith(".mp4") ||
+      clean.endsWith(".webm") ||
+      clean.endsWith(".mov") ||
+      clean.includes("video")
+    );
+  };
 
   // Derived unsaved changes dirty state detection
   const isDirty =
@@ -129,7 +158,7 @@ export function StoreSettingsForm({
   };
 
   // Image File Validations
-  const validateFile = (file: File): boolean => {
+  const validateImageFile = (file: File): boolean => {
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
       toast.error("Invalid file format. Please upload PNG, JPG, JPEG, or WEBP.");
       return false;
@@ -141,9 +170,21 @@ export function StoreSettingsForm({
     return true;
   };
 
+  const validateBannerFile = (file: File): boolean => {
+    if (!ALLOWED_BANNER_TYPES.includes(file.type)) {
+      toast.error("Invalid format. Upload PNG, JPG, WEBP image or MP4, WEBM video.");
+      return false;
+    }
+    if (file.size > MAX_BANNER_FILE_SIZE) {
+      toast.error("File is too large. Maximum allowed size for hero banner is 15MB.");
+      return false;
+    }
+    return true;
+  };
+
   // Upload Handlers
   const handleLogoUpload = async (file: File) => {
-    if (!validateFile(file)) return;
+    if (!validateImageFile(file)) return;
     setLogoUploading(true);
     const formData = new FormData();
     formData.append("file", file);
@@ -164,29 +205,36 @@ export function StoreSettingsForm({
     }
   };
 
-  const handleBannerUpload = async (file: File) => {
-    if (!validateFile(file)) return;
-    setBannerUploading(true);
+  const handleBannerUpload = async (file: File, slideIndex: 1 | 2) => {
+    if (!validateBannerFile(file)) return;
+
+    if (slideIndex === 1) setBanner1Uploading(true);
+    else setBanner2Uploading(true);
+
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const res = await uploadBannerAction(formData);
+      const res = await uploadBannerAction(formData, slideIndex);
       if (res.success) {
-        setBannerPreview(URL.createObjectURL(file));
-        toast.success("Banner uploaded successfully");
+        const objectUrl = URL.createObjectURL(file);
+        if (slideIndex === 1) setBannerPreview1(objectUrl);
+        else setBannerPreview2(objectUrl);
+
+        toast.success(`Hero Slide ${slideIndex} uploaded successfully`);
         router.refresh();
       } else {
-        toast.error(res.error || "Banner upload failed");
+        toast.error(res.error || `Slide ${slideIndex} upload failed`);
       }
     } catch {
-      toast.error("Banner upload failed due to network error");
+      toast.error(`Slide ${slideIndex} upload failed due to network error`);
     } finally {
-      setBannerUploading(false);
+      if (slideIndex === 1) setBanner1Uploading(false);
+      else setBanner2Uploading(false);
     }
   };
 
-  // Remove Image Handlers
+  // Remove Handlers
   const handleRemoveLogo = async () => {
     setLogoUploading(true);
     try {
@@ -205,21 +253,26 @@ export function StoreSettingsForm({
     }
   };
 
-  const handleRemoveBanner = async () => {
-    setBannerUploading(true);
+  const handleRemoveBanner = async (slideIndex: 1 | 2) => {
+    if (slideIndex === 1) setBanner1Uploading(true);
+    else setBanner2Uploading(true);
+
     try {
-      const res = await removeBannerAction();
+      const res = await removeBannerAction(slideIndex);
       if (res.success) {
-        setBannerPreview(null);
-        toast.success("Banner removed");
+        if (slideIndex === 1) setBannerPreview1(null);
+        else setBannerPreview2(null);
+
+        toast.success(`Hero Slide ${slideIndex} removed`);
         router.refresh();
       } else {
-        toast.error(res.error || "Failed to remove banner");
+        toast.error(res.error || `Failed to remove slide ${slideIndex}`);
       }
     } catch {
-      toast.error("Network error removing banner");
+      toast.error(`Network error removing slide ${slideIndex}`);
     } finally {
-      setBannerUploading(false);
+      if (slideIndex === 1) setBanner1Uploading(false);
+      else setBanner2Uploading(false);
     }
   };
 
@@ -234,10 +287,16 @@ export function StoreSettingsForm({
     if (file) handleLogoUpload(file);
   };
 
-  const handleBannerDrop = (e: React.DragEvent) => {
+  const handleBannerDrop1 = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
-    if (file) handleBannerUpload(file);
+    if (file) handleBannerUpload(file, 1);
+  };
+
+  const handleBannerDrop2 = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleBannerUpload(file, 2);
   };
 
   // Save Settings
@@ -499,7 +558,6 @@ export function StoreSettingsForm({
             </CardContent>
           </Card>
 
-
           {/* Form Actions */}
           <div className="flex justify-end gap-4">
             <Button
@@ -594,82 +652,184 @@ export function StoreSettingsForm({
           </CardContent>
         </Card>
 
-        {/* Banner Upload Card */}
+        {/* Dual Hero Banner Upload Card */}
         <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 overflow-hidden relative">
-          {bannerUploading && (
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-15">
-              <div className="text-xs text-white font-medium bg-zinc-900/90 py-1.5 px-3 border border-zinc-800 rounded-lg">
-                Uploading Banner...
-              </div>
-            </div>
-          )}
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-              <ImageIcon className="size-4 text-indigo-500" /> Hero Banner
+              <Video className="size-4 text-indigo-500" /> Hero Banner Media Carousel (2 Slides)
             </CardTitle>
-            <CardDescription>Hero element graphic displayed at the top of the storefront</CardDescription>
+            <CardDescription>Upload 2 media slides (Images or MP4/WEBM Videos). The storefront will swap between them automatically.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
+            {/* Hidden File Inputs */}
             <input
               type="file"
-              ref={bannerInputRef}
+              ref={banner1InputRef}
               onChange={(e) => {
                 const file = e.target.files?.[0];
-                if (file) handleBannerUpload(file);
+                if (file) handleBannerUpload(file, 1);
               }}
               className="hidden"
-              accept="image/*"
+              accept="image/*,video/*"
+            />
+            <input
+              type="file"
+              ref={banner2InputRef}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleBannerUpload(file, 2);
+              }}
+              className="hidden"
+              accept="image/*,video/*"
             />
 
-            <div
-              onDragOver={handleDragOver}
-              onDrop={handleBannerDrop}
-              onClick={() => bannerInputRef.current?.click()}
-              className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer transition-all bg-zinc-50/50 dark:bg-zinc-950/20"
-            >
-              {bannerPreview ? (
-                <div className="space-y-3 w-full flex flex-col items-center">
-                  <div className="w-full aspect-video rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={bannerPreview} alt="Store banner preview" className="w-full h-full object-cover" />
+            {/* Slide 1 Uploader */}
+            <div className="space-y-2">
+              <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+                <ImageIcon className="size-3.5 text-indigo-500" /> Hero Slide 1 (Primary Media)
+              </span>
+
+              <div className="relative rounded-xl border-2 border-dashed border-zinc-200 dark:border-zinc-800 overflow-hidden p-3 bg-zinc-50/50 dark:bg-zinc-950/20">
+                {banner1Uploading && (
+                  <div className="absolute inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-15">
+                    <span className="text-xs text-white font-medium bg-zinc-900/90 py-1.5 px-3 border border-zinc-800 rounded-lg">
+                      Uploading Slide 1...
+                    </span>
                   </div>
-                  <span className="text-xs text-zinc-500">Drag banner here or click to replace</span>
+                )}
+
+                <div
+                  onDragOver={handleDragOver}
+                  onDrop={handleBannerDrop1}
+                  onClick={() => banner1InputRef.current?.click()}
+                  className="cursor-pointer flex flex-col items-center justify-center text-center py-4"
+                >
+                  {bannerPreview1 ? (
+                    <div className="space-y-2 w-full flex flex-col items-center">
+                      <div className="w-full aspect-video rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-black flex items-center justify-center">
+                        {isVideoUrl(bannerPreview1) ? (
+                          <video
+                            src={bannerPreview1}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={bannerPreview1} alt="Hero Slide 1" className="w-full h-full object-cover" />
+                        )}
+                      </div>
+                      <span className="text-[11px] text-zinc-400">Click or drag file to replace Slide 1</span>
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      <UploadCloud className="size-6 text-zinc-400 mx-auto" />
+                      <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Upload Slide 1 (Image or Video)</span>
+                      <p className="text-[10px] text-zinc-400">PNG, JPG, WEBP, MP4, WEBM (Max 15MB)</p>
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="space-y-2">
-                  <div className="mx-auto size-10 rounded-full bg-zinc-100 dark:bg-zinc-855 flex items-center justify-center border border-zinc-200 dark:border-zinc-800">
-                    <UploadCloud className="size-5 text-zinc-400" />
+
+                {bannerPreview1 && (
+                  <div className="flex gap-2 justify-center pt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => banner1InputRef.current?.click()}
+                      className="text-xs h-7 px-2.5"
+                    >
+                      Replace Slide 1
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleRemoveBanner(1)}
+                      className="bg-red-950/20 text-red-400 border border-red-950/50 text-xs h-7 px-2.5"
+                    >
+                      Remove
+                    </Button>
                   </div>
-                  <div>
-                    <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Upload store banner</span>
-                    <p className="text-[10px] text-zinc-400 mt-1">PNG, JPG, JPEG or WEBP (Max 5MB)</p>
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
-            {bannerPreview && (
-              <div className="flex gap-2 justify-center">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => bannerInputRef.current?.click()}
-                  className="bg-transparent text-zinc-600 border-zinc-200 hover:bg-zinc-50 dark:text-zinc-300 dark:border-zinc-800 dark:hover:bg-zinc-900 text-xs"
+            {/* Slide 2 Uploader */}
+            <div className="space-y-2">
+              <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+                <Video className="size-3.5 text-purple-500" /> Hero Slide 2 (Secondary Media)
+              </span>
+
+              <div className="relative rounded-xl border-2 border-dashed border-zinc-200 dark:border-zinc-800 overflow-hidden p-3 bg-zinc-50/50 dark:bg-zinc-950/20">
+                {banner2Uploading && (
+                  <div className="absolute inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center z-15">
+                    <span className="text-xs text-white font-medium bg-zinc-900/90 py-1.5 px-3 border border-zinc-800 rounded-lg">
+                      Uploading Slide 2...
+                    </span>
+                  </div>
+                )}
+
+                <div
+                  onDragOver={handleDragOver}
+                  onDrop={handleBannerDrop2}
+                  onClick={() => banner2InputRef.current?.click()}
+                  className="cursor-pointer flex flex-col items-center justify-center text-center py-4"
                 >
-                  Replace Banner
-                </Button>
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleRemoveBanner}
-                  className="bg-red-950/20 text-red-400 border border-red-950/50 hover:bg-red-950/50 text-xs gap-1.5"
-                >
-                  <Trash2 className="size-3.5" /> Remove
-                </Button>
+                  {bannerPreview2 ? (
+                    <div className="space-y-2 w-full flex flex-col items-center">
+                      <div className="w-full aspect-video rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-black flex items-center justify-center">
+                        {isVideoUrl(bannerPreview2) ? (
+                          <video
+                            src={bannerPreview2}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={bannerPreview2} alt="Hero Slide 2" className="w-full h-full object-cover" />
+                        )}
+                      </div>
+                      <span className="text-[11px] text-zinc-400">Click or drag file to replace Slide 2</span>
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      <UploadCloud className="size-6 text-zinc-400 mx-auto" />
+                      <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Upload Slide 2 (Image or Video)</span>
+                      <p className="text-[10px] text-zinc-400">PNG, JPG, WEBP, MP4, WEBM (Max 15MB)</p>
+                    </div>
+                  )}
+                </div>
+
+                {bannerPreview2 && (
+                  <div className="flex gap-2 justify-center pt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => banner2InputRef.current?.click()}
+                      className="text-xs h-7 px-2.5"
+                    >
+                      Replace Slide 2
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleRemoveBanner(2)}
+                      className="bg-red-950/20 text-red-400 border border-red-950/50 text-xs h-7 px-2.5"
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </CardContent>
         </Card>
 

@@ -10,7 +10,7 @@ import {
   removeLogo,
   removeBanner,
 } from "./service";
-import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from "./constants";
+import { ALLOWED_IMAGE_TYPES, ALLOWED_BANNER_TYPES, MAX_FILE_SIZE, MAX_BANNER_FILE_SIZE } from "./constants";
 
 export async function updateStoreSettingsAction(data: StoreSettingsInput) {
   const user = await getCurrentUser();
@@ -57,24 +57,24 @@ export async function uploadLogoAction(formData: FormData) {
   }
 }
 
-export async function uploadBannerAction(formData: FormData) {
+export async function uploadBannerAction(formData: FormData, slideIndex: 1 | 2 = 1) {
   const user = await getCurrentUser();
   if (!user) return { success: false, error: "Unauthorized" };
 
   const file = formData.get("file") as File;
   if (!file) return { success: false, error: "No file provided" };
 
-  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-    return { success: false, error: "Invalid file type. Only PNG, JPG, JPEG, and WEBP are allowed." };
+  if (!ALLOWED_BANNER_TYPES.includes(file.type)) {
+    return { success: false, error: "Invalid file type. PNG, JPG, WEBP, MP4, and WEBM are allowed." };
   }
 
-  if (file.size > MAX_FILE_SIZE) {
-    return { success: false, error: "File size exceeds the 5MB limit." };
+  if (file.size > MAX_BANNER_FILE_SIZE) {
+    return { success: false, error: "File size exceeds the 15MB limit." };
   }
 
   try {
     const fileBuffer = Buffer.from(await file.arrayBuffer());
-    const path = await uploadBanner(user.id, fileBuffer, file.type);
+    const path = await uploadBanner(user.id, fileBuffer, file.type, slideIndex);
     revalidatePath("/merchant", "layout");
     return { success: true, path };
   } catch (err) {
@@ -97,12 +97,12 @@ export async function removeLogoAction() {
   }
 }
 
-export async function removeBannerAction() {
+export async function removeBannerAction(slideIndex: 1 | 2 = 1) {
   const user = await getCurrentUser();
   if (!user) return { success: false, error: "Unauthorized" };
 
   try {
-    await removeBanner(user.id);
+    await removeBanner(user.id, slideIndex);
     revalidatePath("/merchant", "layout");
     return { success: true };
   } catch (err) {

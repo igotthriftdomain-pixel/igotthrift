@@ -31,6 +31,11 @@ export interface StorefrontCategory {
   sortOrder: number;
 }
 
+export interface HeroBannerSlide {
+  url: string;
+  type: "image" | "video";
+}
+
 export interface StorefrontDetails {
   id: string;
   name: string;
@@ -38,6 +43,8 @@ export interface StorefrontDetails {
   description: string | null;
   logoUrl: string | null;
   bannerUrl: string | null;
+  bannerUrl2?: string | null;
+  heroSlides?: HeroBannerSlide[];
   whatsappNumber: string | null;
   address: string | null;
   themeColor: string;

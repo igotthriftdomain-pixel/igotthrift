@@ -28,14 +28,39 @@ export async function getStoreSettings(userId: string) {
   const logoPublicUrl = store.logo_url
     ? supabase.storage.from("store-assets").getPublicUrl(store.logo_url).data.publicUrl
     : null;
-  const bannerPublicUrl = store.banner_url
+
+  let bannerPublicUrl1 = store.banner_url
     ? supabase.storage.from("store-assets").getPublicUrl(store.banner_url).data.publicUrl
     : null;
+  let bannerPublicUrl2: string | null = null;
+
+  // Check storage files for slide 1 and slide 2
+  const { data: files } = await supabase.storage
+    .from("store-assets")
+    .list(`stores/${store.id}`);
+
+  if (files && files.length > 0) {
+    const f1 = files.find((f) => f.name.startsWith("banner_1."));
+    const f2 = files.find((f) => f.name.startsWith("banner_2."));
+
+    if (f1) {
+      bannerPublicUrl1 = supabase.storage
+        .from("store-assets")
+        .getPublicUrl(`stores/${store.id}/${f1.name}`).data.publicUrl;
+    }
+    if (f2) {
+      bannerPublicUrl2 = supabase.storage
+        .from("store-assets")
+        .getPublicUrl(`stores/${store.id}/${f2.name}`).data.publicUrl;
+    }
+  }
 
   return {
     store,
     logoPublicUrl,
-    bannerPublicUrl,
+    bannerPublicUrl: bannerPublicUrl1,
+    bannerPublicUrl1,
+    bannerPublicUrl2,
   };
 }
 
@@ -94,12 +119,28 @@ export async function uploadLogo(userId: string, fileBuffer: Buffer, contentType
   return storagePath;
 }
 
-export async function uploadBanner(userId: string, fileBuffer: Buffer, contentType: string) {
+export async function uploadBanner(
+  userId: string,
+  fileBuffer: Buffer,
+  contentType: string,
+  slideIndex: 1 | 2 = 1
+) {
   const supabase = await createClient();
   const store = await getStoreByOwner(userId);
   if (!store) throw new Error("Store not found");
 
-  const storagePath = `stores/${store.id}/banner.png`;
+  const extMap: Record<string, string> = {
+    "image/png": "png",
+    "image/jpeg": "jpg",
+    "image/jpg": "jpg",
+    "image/webp": "webp",
+    "video/mp4": "mp4",
+    "video/webm": "webm",
+    "video/quicktime": "mov",
+  };
+  const ext = extMap[contentType] || "png";
+
+  const storagePath = `stores/${store.id}/banner_${slideIndex}.${ext}`;
 
   const { error: uploadError } = await supabase.storage
     .from("store-assets")
@@ -110,12 +151,12 @@ export async function uploadBanner(userId: string, fileBuffer: Buffer, contentTy
 
   if (uploadError) throw new Error(uploadError.message);
 
-  const { error: updateError } = await supabase
-    .from("stores")
-    .update({ banner_url: storagePath })
-    .eq("id", store.id);
-
-  if (updateError) throw new Error(updateError.message);
+  if (slideIndex === 1) {
+    await supabase
+      .from("stores")
+      .update({ banner_url: storagePath })
+      .eq("id", store.id);
+  }
 
   return storagePath;
 }
@@ -141,23 +182,24 @@ export async function removeLogo(userId: string) {
   if (updateError) throw new Error(updateError.message);
 }
 
-export async function removeBanner(userId: string) {
+export async function removeBanner(userId: string, slideIndex: 1 | 2 = 1) {
   const supabase = await createClient();
   const store = await getStoreByOwner(userId);
   if (!store) throw new Error("Store not found");
 
-  if (!store.banner_url) return;
+  await supabase.storage.from("store-assets").remove([
+    `stores/${store.id}/banner_${slideIndex}.png`,
+    `stores/${store.id}/banner_${slideIndex}.jpg`,
+    `stores/${store.id}/banner_${slideIndex}.jpeg`,
+    `stores/${store.id}/banner_${slideIndex}.webp`,
+    `stores/${store.id}/banner_${slideIndex}.mp4`,
+    `stores/${store.id}/banner_${slideIndex}.webm`,
+  ]);
 
-  const { error: deleteError } = await supabase.storage
-    .from("store-assets")
-    .remove([store.banner_url]);
-
-  if (deleteError) throw new Error(deleteError.message);
-
-  const { error: updateError } = await supabase
-    .from("stores")
-    .update({ banner_url: null })
-    .eq("id", store.id);
-
-  if (updateError) throw new Error(updateError.message);
+  if (slideIndex === 1) {
+    await supabase
+      .from("stores")
+      .update({ banner_url: null })
+      .eq("id", store.id);
+  }
 }

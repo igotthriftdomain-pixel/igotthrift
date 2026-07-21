@@ -24,6 +24,20 @@ interface RawProductSelect {
   product_images: Array<{ storage_path: string; display_order: number }> | null;
 }
 
+function getMediaTypeFromUrl(url: string | null): "image" | "video" {
+  if (!url) return "image";
+  const cleanUrl = url.split("?")[0].toLowerCase();
+  if (
+    cleanUrl.endsWith(".mp4") ||
+    cleanUrl.endsWith(".webm") ||
+    cleanUrl.endsWith(".mov") ||
+    cleanUrl.includes("video")
+  ) {
+    return "video";
+  }
+  return "image";
+}
+
 export const getStoreBySlug = cache(async (slug: string): Promise<StorefrontDetails | null> => {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -38,9 +52,40 @@ export const getStoreBySlug = cache(async (slug: string): Promise<StorefrontDeta
   const logoUrl = data.logo_url
     ? supabase.storage.from("store-assets").getPublicUrl(data.logo_url).data.publicUrl
     : null;
-  const bannerUrl = data.banner_url
+
+  let bannerUrl1 = data.banner_url
     ? supabase.storage.from("store-assets").getPublicUrl(data.banner_url).data.publicUrl
     : null;
+  let bannerUrl2: string | null = null;
+
+  // Check storage bucket for slide 2 (or alternative format slide 1)
+  const { data: storeFiles } = await supabase.storage
+    .from("store-assets")
+    .list(`stores/${data.id}`);
+
+  if (storeFiles && storeFiles.length > 0) {
+    const file1 = storeFiles.find((f) => f.name.startsWith("banner_1."));
+    const file2 = storeFiles.find((f) => f.name.startsWith("banner_2."));
+
+    if (file1) {
+      bannerUrl1 = supabase.storage
+        .from("store-assets")
+        .getPublicUrl(`stores/${data.id}/${file1.name}`).data.publicUrl;
+    }
+    if (file2) {
+      bannerUrl2 = supabase.storage
+        .from("store-assets")
+        .getPublicUrl(`stores/${data.id}/${file2.name}`).data.publicUrl;
+    }
+  }
+
+  const heroSlides: Array<{ url: string; type: "image" | "video" }> = [];
+  if (bannerUrl1) {
+    heroSlides.push({ url: bannerUrl1, type: getMediaTypeFromUrl(bannerUrl1) });
+  }
+  if (bannerUrl2) {
+    heroSlides.push({ url: bannerUrl2, type: getMediaTypeFromUrl(bannerUrl2) });
+  }
 
   return {
     id: data.id,
@@ -48,7 +93,9 @@ export const getStoreBySlug = cache(async (slug: string): Promise<StorefrontDeta
     slug: data.slug,
     description: data.description,
     logoUrl,
-    bannerUrl,
+    bannerUrl: bannerUrl1,
+    bannerUrl2,
+    heroSlides,
     whatsappNumber: data.whatsapp_number,
     address: data.address,
     themeColor: data.theme_color || "#09090b",

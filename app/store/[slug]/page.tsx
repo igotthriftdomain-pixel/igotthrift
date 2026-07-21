@@ -34,7 +34,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const title = store.metaTitle || store.name;
-  const description = store.metaDescription || store.description || `Browse curated vintage thrift items at ${store.name}.`;
+  const description =
+    store.metaDescription ||
+    store.description ||
+    `Browse curated vintage thrift items at ${store.name}.`;
 
   return {
     title,
@@ -59,7 +62,7 @@ export default async function StorefrontPage({ params, searchParams }: PageProps
   const activeCategory = resolvedSearchParams.category || "all";
 
   return (
-    <div className="space-y-12 pb-20">
+    <div className="space-y-12 pb-24">
       {/* Streamed Hero Section */}
       <Suspense fallback={<HeroSkeleton />}>
         <HeroSectionWrapper slug={resolvedParams.slug} />
@@ -114,8 +117,7 @@ async function CatalogSectionWrapper({
     <div className="space-y-12">
       {/* Categories Horizontal Tabs Selector */}
       {categories.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 uppercase tracking-wider">Browse Categories</h2>
+        <div className="space-y-3">
           <CategoryList
             categories={categories}
             activeCategory={activeCategory}
@@ -132,12 +134,12 @@ async function CatalogSectionWrapper({
       )}
 
       {/* Catalog items */}
-      <div id="products-catalog" className="pt-6">
+      <div id="products-catalog" className="pt-4">
         <Suspense fallback={<GridSkeleton />}>
           <ProductGrid
             products={catalogProducts}
             store={store}
-            title={activeCategory === "all" ? "All Arrivals" : "Category Items"}
+            title={activeCategory === "all" ? "All Drop Arrivals" : "Curated Collection"}
           />
         </Suspense>
       </div>
@@ -148,11 +150,11 @@ async function CatalogSectionWrapper({
 // Loading Skeletons
 function HeroSkeleton() {
   return (
-    <div className="w-full h-[420px] bg-zinc-900 dark:bg-zinc-950 flex flex-col items-center justify-center space-y-4 p-8">
-      <Skeleton className="size-20 rounded-full bg-zinc-800" />
+    <div className="w-full h-[480px] bg-[#0A0A0A] flex flex-col items-center justify-center space-y-4 p-8">
+      <Skeleton className="size-24 rounded-full bg-zinc-800" />
       <Skeleton className="h-10 w-64 bg-zinc-800" />
       <Skeleton className="h-4 w-96 bg-zinc-800" />
-      <Skeleton className="h-10 w-36 bg-zinc-800 rounded-lg" />
+      <Skeleton className="h-12 w-44 bg-[#F36B00] rounded-xl" />
     </div>
   );
 }
@@ -161,11 +163,11 @@ function CatalogSkeleton() {
   return (
     <div className="space-y-10 py-6">
       <div className="space-y-2">
-        <Skeleton className="h-4 w-48 bg-zinc-200 dark:bg-zinc-800" />
+        <Skeleton className="h-4 w-48 bg-[#E8E2D8] dark:bg-zinc-800" />
         <div className="flex gap-3 overflow-hidden">
-          <Skeleton className="h-8 w-24 rounded-full bg-zinc-200 dark:bg-zinc-800 shrink-0" />
-          <Skeleton className="h-8 w-24 rounded-full bg-zinc-200 dark:bg-zinc-800 shrink-0" />
-          <Skeleton className="h-8 w-24 rounded-full bg-zinc-200 dark:bg-zinc-800 shrink-0" />
+          <Skeleton className="h-9 w-28 rounded-full bg-[#E8E2D8] dark:bg-zinc-800 shrink-0" />
+          <Skeleton className="h-9 w-28 rounded-full bg-[#E8E2D8] dark:bg-zinc-800 shrink-0" />
+          <Skeleton className="h-9 w-28 rounded-full bg-[#E8E2D8] dark:bg-zinc-800 shrink-0" />
         </div>
       </div>
       <GridSkeleton />
@@ -176,15 +178,18 @@ function CatalogSkeleton() {
 function GridSkeleton() {
   return (
     <div className="space-y-4">
-      <Skeleton className="h-6 w-36 bg-zinc-200 dark:bg-zinc-800" />
+      <Skeleton className="h-7 w-48 bg-[#E8E2D8] dark:bg-zinc-800" />
       <div className="grid gap-6 grid-cols-2 md:grid-cols-4">
-        {[1, 2, 4, 4].map((i) => (
-          <div key={i} className="border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden p-3 space-y-4">
-            <Skeleton className="aspect-square w-full rounded-lg bg-zinc-200 dark:bg-zinc-800" />
-            <Skeleton className="h-4 w-3/4 bg-zinc-200 dark:bg-zinc-800" />
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="border border-[#E8E2D8] dark:border-zinc-800 rounded-2xl overflow-hidden p-3 space-y-4 bg-white dark:bg-zinc-900"
+          >
+            <Skeleton className="aspect-[4/5] w-full rounded-xl bg-[#E8E2D8] dark:bg-zinc-800" />
+            <Skeleton className="h-4 w-3/4 bg-[#E8E2D8] dark:bg-zinc-800" />
             <div className="flex justify-between items-center">
-              <Skeleton className="h-5 w-16 bg-zinc-200 dark:bg-zinc-800" />
-              <Skeleton className="h-8 w-24 rounded-lg bg-zinc-200 dark:bg-zinc-800" />
+              <Skeleton className="h-5 w-16 bg-[#E8E2D8] dark:bg-zinc-800" />
+              <Skeleton className="h-9 w-24 rounded-xl bg-[#E8E2D8] dark:bg-zinc-800" />
             </div>
           </div>
         ))}

@@ -31,7 +31,9 @@ export default async function SettingsPage() {
       <StoreSettingsForm
         initialStore={result.store}
         initialLogoUrl={result.logoPublicUrl}
-        initialBannerUrl={result.bannerPublicUrl}
+        initialBannerUrl={result.bannerPublicUrl1 || result.bannerPublicUrl}
+        initialBannerUrl1={result.bannerPublicUrl1 || result.bannerPublicUrl}
+        initialBannerUrl2={result.bannerPublicUrl2}
       />
 
       <div className="max-w-4xl">

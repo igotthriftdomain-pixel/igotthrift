@@ -1,5 +1,5 @@
 import { type StorefrontDetails } from "../types";
-import { Globe, MapPin, Send } from "lucide-react";
+import { Globe, MapPin, Send, Sparkles } from "lucide-react";
 
 const InstagramIcon = ({ className }: { className?: string }) => (
   <svg
@@ -35,31 +35,41 @@ const FacebookIcon = ({ className }: { className?: string }) => (
 
 export function StorefrontFooter({ store }: { store: StorefrontDetails }) {
   return (
-    <footer className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 py-12 text-zinc-500 dark:text-zinc-400 text-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-8 md:grid-cols-3">
+    <footer className="border-t border-zinc-800 bg-[#0A0A0A] py-16 text-zinc-400 text-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-10 md:grid-cols-3">
         {/* Branding & description */}
         <div className="space-y-4">
-          <h4 className="font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">{store.name}</h4>
-          <p className="text-xs text-zinc-500 leading-relaxed max-w-xs">
-            {store.description || "Thank you for visiting! Browse our curated collections and complete checkouts seamlessly on WhatsApp."}
+          <div className="flex items-center gap-3">
+            {store.logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={store.logoUrl} alt={store.name} className="size-8 rounded-full object-cover border border-[#FFBC0A]" />
+            ) : (
+              <div className="size-8 rounded-full bg-[#FFBC0A] text-[#0A0A0A] flex items-center justify-center font-black text-xs uppercase">
+                {store.name.substring(0, 2)}
+              </div>
+            )}
+            <h4 className="font-black text-[#FAF8F3] text-lg tracking-tight uppercase">{store.name}</h4>
+          </div>
+          <p className="text-xs text-zinc-400 leading-relaxed max-w-sm">
+            {store.description || "Curated vintage thrift & streetwear drops. Hand-checked for quality & authenticity with seamless WhatsApp ordering."}
           </p>
         </div>
 
         {/* Contact/Address */}
         <div className="space-y-4">
-          <h4 className="font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">Visit Us</h4>
-          <div className="space-y-2 text-xs">
+          <h4 className="font-extrabold text-[#FFBC0A] text-xs uppercase tracking-widest">Store Location & Contact</h4>
+          <div className="space-y-2.5 text-xs text-zinc-300">
             {store.address ? (
               <p className="flex items-start gap-2">
-                <MapPin className="size-4 shrink-0 text-zinc-400 mt-0.5" />
+                <MapPin className="size-4 shrink-0 text-[#FFBC0A] mt-0.5" />
                 <span>{store.address}</span>
               </p>
             ) : (
-              <p className="text-zinc-400">Online Store Only</p>
+              <p className="text-zinc-500">Online Boutique Store</p>
             )}
             {store.whatsappNumber && (
               <p className="flex items-start gap-2">
-                <Send className="size-4 shrink-0 text-zinc-400 mt-0.5" />
+                <Send className="size-4 shrink-0 text-[#FFBC0A] mt-0.5" />
                 <span>WhatsApp: {store.whatsappNumber}</span>
               </p>
             )}
@@ -68,30 +78,51 @@ export function StorefrontFooter({ store }: { store: StorefrontDetails }) {
 
         {/* Social connections */}
         <div className="space-y-4">
-          <h4 className="font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">Follow Us</h4>
-          <div className="flex gap-4 text-zinc-500 dark:text-zinc-400">
+          <h4 className="font-extrabold text-[#FFBC0A] text-xs uppercase tracking-widest">Connect With Us</h4>
+          <div className="flex gap-4 text-zinc-400">
             {store.instagram && (
-              <a href={store.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--store-theme)] transition-colors" aria-label="Instagram Link">
-                <InstagramIcon className="size-5" />
+              <a
+                href={store.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="size-9 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:text-[#FFBC0A] hover:border-[#FFBC0A] transition-colors"
+                aria-label="Instagram Link"
+              >
+                <InstagramIcon className="size-4" />
               </a>
             )}
             {store.facebook && (
-              <a href={store.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--store-theme)] transition-colors" aria-label="Facebook Link">
-                <FacebookIcon className="size-5" />
+              <a
+                href={store.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="size-9 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:text-[#FFBC0A] hover:border-[#FFBC0A] transition-colors"
+                aria-label="Facebook Link"
+              >
+                <FacebookIcon className="size-4" />
               </a>
             )}
             {store.website && (
-              <a href={store.website} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--store-theme)] transition-colors" aria-label="Store Website Link">
-                <Globe className="size-5" />
+              <a
+                href={store.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="size-9 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:text-[#FFBC0A] hover:border-[#FFBC0A] transition-colors"
+                aria-label="Store Website Link"
+              >
+                <Globe className="size-4" />
               </a>
             )}
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-8 border-t border-zinc-150 dark:border-zinc-900 text-center text-xs text-zinc-400">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-zinc-900 text-center text-xs text-zinc-500 flex flex-col sm:flex-row justify-between items-center gap-3">
         <p>&copy; {new Date().getFullYear()} {store.name}. All rights reserved.</p>
-        <p className="mt-1">Powered by Commerce Engine. Direct WhatsApp order routing.</p>
+        <div className="flex items-center gap-1.5 text-[11px] text-zinc-400 font-bold uppercase tracking-wider">
+          <Sparkles className="size-3 text-[#FFBC0A]" />
+          <span>Powered by iGotThrift Commerce Engine</span>
+        </div>
       </div>
     </footer>
   );

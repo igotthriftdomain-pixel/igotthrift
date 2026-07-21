@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, ShoppingCart } from "lucide-react";
+import { Loader2, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface AddToCartButtonProps {
@@ -15,19 +15,19 @@ export function AddToCartButton({ disabled, loading, onClick }: AddToCartButtonP
       type="button"
       disabled={disabled || loading}
       onClick={onClick}
-      className="w-full md:w-auto md:px-8 h-12 rounded-xl bg-[var(--store-theme)] hover:bg-[var(--store-theme-hover)] text-white font-bold text-sm tracking-wide transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+      className="w-full md:w-auto md:px-10 h-12 rounded-xl bg-[#F36B00] hover:bg-[#e06200] text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none border-0"
       aria-busy={loading}
       aria-live="polite"
     >
       {loading ? (
         <>
           <Loader2 className="size-4 animate-spin" />
-          <span>Adding to Cart...</span>
+          <span>Adding to Drop Bag...</span>
         </>
       ) : (
         <>
-          <ShoppingCart className="size-4" />
-          <span>Add to Cart</span>
+          <ShoppingBag className="size-4" />
+          <span>Add to Bag</span>
         </>
       )}
     </Button>

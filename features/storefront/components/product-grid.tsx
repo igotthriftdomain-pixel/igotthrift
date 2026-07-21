@@ -1,6 +1,6 @@
 import { type StorefrontProduct, type StorefrontDetails } from "../types";
 import { ProductCard } from "./product-card";
-import { Search } from "lucide-react";
+import { Sparkles, PackageSearch } from "lucide-react";
 
 export function ProductGrid({
   products,
@@ -13,11 +13,13 @@ export function ProductGrid({
 }) {
   if (products.length === 0) {
     return (
-      <div className="text-center py-12 bg-white dark:bg-zinc-950/20 border border-zinc-200 dark:border-zinc-800 rounded-xl max-w-xl mx-auto my-8">
-        <Search className="size-8 text-zinc-300 dark:text-zinc-700 mx-auto mb-3" />
-        <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">No products found</h4>
-        <p className="text-xs text-zinc-400 mt-1">
-          No items match your active filters. Check back later for fresh thrift drops!
+      <div className="text-center py-16 px-4 bg-[#F3EFE7]/60 dark:bg-zinc-900/40 border border-[#E8E2D8] dark:border-zinc-800 rounded-3xl max-w-xl mx-auto my-12 space-y-3">
+        <PackageSearch className="size-10 text-[#FFBC0A] mx-auto mb-2" />
+        <h4 className="text-base font-extrabold text-[#0A0A0A] dark:text-[#FAF8F3] uppercase tracking-wider">
+          No items found in this drop
+        </h4>
+        <p className="text-xs text-zinc-500 leading-relaxed max-w-sm mx-auto">
+          No active items match your filter. Check back soon for fresh curated drops!
         </p>
       </div>
     );
@@ -26,11 +28,19 @@ export function ProductGrid({
   return (
     <div className="space-y-6">
       {title && (
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 border-b border-zinc-100 dark:border-zinc-900 pb-3">
-          {title}
-        </h2>
+        <div className="flex items-center justify-between border-b border-[#E8E2D8] dark:border-zinc-800 pb-4">
+          <div className="flex items-center gap-2">
+            <Sparkles className="size-4 text-[#F36B00]" />
+            <h2 className="text-lg sm:text-2xl font-black uppercase tracking-tight text-[#0A0A0A] dark:text-[#FAF8F3]">
+              {title}
+            </h2>
+          </div>
+          <span className="text-xs font-extrabold text-zinc-400 uppercase tracking-widest">
+            {products.length} {products.length === 1 ? "Item" : "Items"}
+          </span>
+        </div>
       )}
-      <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} store={store} />
         ))}
