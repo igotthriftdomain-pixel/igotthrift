@@ -9,11 +9,24 @@ export async function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   const pathname = url.pathname;
 
-  // 1. Redirect root to default storefront
+  // 1. Root path handling based on domain
+  const hostname = request.nextUrl.hostname;
+  const isAdminDomain = hostname.startsWith("admin.");
+
   if (pathname === "/") {
-    const defaultSlug = process.env.NEXT_PUBLIC_DEFAULT_STORE_SLUG || "demo";
-    url.pathname = `/store/${defaultSlug}`;
-    return NextResponse.redirect(url);
+    if (isAdminDomain) {
+      const { user, supabaseResponse } = await updateSession(request);
+      url.pathname = user ? "/dashboard" : LOGIN_ROUTE;
+      const redirectResponse = NextResponse.redirect(url);
+      supabaseResponse.cookies.getAll().forEach((cookie) => {
+        redirectResponse.cookies.set(cookie);
+      });
+      return redirectResponse;
+    } else {
+      const defaultSlug = process.env.NEXT_PUBLIC_DEFAULT_STORE_SLUG || "demo";
+      url.pathname = `/store/${defaultSlug}`;
+      return NextResponse.redirect(url);
+    }
   }
 
   // 2. Protect merchant dashboard routes
