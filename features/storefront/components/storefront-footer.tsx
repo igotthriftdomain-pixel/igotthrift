@@ -1,5 +1,5 @@
 import { type StorefrontDetails } from "../types";
-import { Globe, MapPin, Send, Sparkles } from "lucide-react";
+import { Globe, MapPin, Send } from "lucide-react";
 
 const InstagramIcon = ({ className }: { className?: string }) => (
   <svg
@@ -117,12 +117,8 @@ export function StorefrontFooter({ store }: { store: StorefrontDetails }) {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-zinc-900 text-center text-xs text-zinc-500 flex flex-col sm:flex-row justify-between items-center gap-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-zinc-900 text-center text-xs text-zinc-500">
         <p>&copy; {new Date().getFullYear()} {store.name}. All rights reserved.</p>
-        <div className="flex items-center gap-1.5 text-[11px] text-zinc-400 font-bold uppercase tracking-wider">
-          <Sparkles className="size-3 text-[#FFBC0A]" />
-          <span>Powered by iGotThrift Commerce Engine</span>
-        </div>
       </div>
     </footer>
   );
