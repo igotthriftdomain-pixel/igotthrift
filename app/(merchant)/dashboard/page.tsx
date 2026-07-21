@@ -4,8 +4,7 @@ import { getCurrentUser } from "@/features/auth/service";
 import { getStoreByOwner } from "@/features/store/service";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ShoppingBag, FolderTree, ExternalLink, Plus, Package } from "lucide-react";
+import { ShoppingBag, FolderTree, ExternalLink, Plus } from "lucide-react";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -36,15 +35,6 @@ export default async function DashboardPage() {
     .from("categories")
     .select("*", { count: "exact", head: true })
     .eq("store_id", store.id);
-
-  // Fetch 5 most recent products
-  const { data: recentProducts } = await supabase
-    .from("products")
-    .select("id, name, price, stock, active, created_at, categories(name)")
-    .eq("store_id", store.id)
-    .is("deleted_at", null)
-    .order("created_at", { ascending: false })
-    .limit(5);
 
   const totalProducts = productCount ?? 0;
   const totalCategories = categoryCount ?? 0;
@@ -129,86 +119,6 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Recent Activity Table */}
-      <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 overflow-hidden">
-        <div className="p-6 border-b border-zinc-150 dark:border-zinc-800 flex items-center justify-between">
-          <div>
-            <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-base">
-              Recent Catalog Additions
-            </h3>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-              Latest items added to your shop
-            </p>
-          </div>
-          <Link
-            href="/products"
-            className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"
-          >
-            View All →
-          </Link>
-        </div>
-
-        {recentProducts && recentProducts.length > 0 ? (
-          <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
-            {recentProducts.map((p) => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const categoryName = (p.categories as any)?.name || "Uncategorized";
-              return (
-                <div
-                  key={p.id}
-                  className="p-4 flex items-center justify-between hover:bg-zinc-50/50 dark:hover:bg-zinc-950/30 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="size-9 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-400 shrink-0">
-                      <Package className="size-4" />
-                    </div>
-                    <div>
-                      <Link
-                        href={`/products/${p.id}/edit`}
-                        className="font-bold text-sm text-zinc-900 dark:text-zinc-100 hover:underline line-clamp-1"
-                      >
-                        {p.name}
-                      </Link>
-                      <div className="flex items-center gap-2 text-xs text-zinc-400 mt-0.5">
-                        <span>{categoryName}</span>
-                        <span>•</span>
-                        <span>Stock: {p.stock}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100 font-mono">
-                      {store.currency_symbol}
-                      {p.price.toLocaleString("en-IN")}
-                    </span>
-                    <Badge
-                      variant={p.active ? "default" : "secondary"}
-                      className="text-[10px] uppercase font-bold"
-                    >
-                      {p.active ? "Active" : "Draft"}
-                    </Badge>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="p-8 text-center space-y-3">
-            <Package className="size-8 text-zinc-300 mx-auto" />
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              No catalog items logged yet. Begin adding items from the catalog section.
-            </p>
-            <Link
-              href="/products/new"
-              className="inline-flex items-center justify-center rounded-lg bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:text-zinc-950 px-4 h-9 text-xs font-semibold"
-            >
-              Add First Product
-            </Link>
-          </div>
-        )}
-      </Card>
     </div>
   );
 }
