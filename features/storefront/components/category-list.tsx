@@ -15,7 +15,7 @@ export function CategoryList({
   return (
     <div className="w-full border-y border-[#E8E2D8] dark:border-zinc-800 bg-[#FAF8F3]/95 dark:bg-[#0A0A0A]/95 backdrop-blur-xs sticky top-16 z-40 py-2.5 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex gap-2.5 overflow-x-auto py-1 no-scrollbar scroll-smooth items-center">
+        <div className="flex gap-2.5 overflow-x-auto py-1 no-scrollbar scroll-smooth items-center md:justify-center">
           <span className="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest shrink-0 mr-2 hidden sm:inline">
             Categories:
           </span>

@@ -13,9 +13,9 @@ export function StorefrontHeader({ store }: { store: StorefrontDetails }) {
         <Sparkles className="size-3 text-[#FFBC0A]" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Branding Logo / Name */}
-        <Link href={`/store/${store.slug}`} className="flex items-center gap-3 group">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between relative">
+        {/* Branding Logo / Name - Positioned on Left */}
+        <Link href={`/store/${store.slug}`} className="flex items-center gap-3 group shrink-0">
           {store.logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -38,8 +38,8 @@ export function StorefrontHeader({ store }: { store: StorefrontDetails }) {
           </div>
         </Link>
 
-        {/* Navigation links */}
-        <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-[#0A0A0A]/70 dark:text-zinc-300">
+        {/* Catalog / Navigation Links - Exactly Centered on Page */}
+        <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-[#0A0A0A]/70 dark:text-zinc-300 absolute left-1/2 -translate-x-1/2">
           <Link
             href={`/store/${store.slug}`}
             className="hover:text-[#0A0A0A] dark:hover:text-white transition-colors relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 after:bg-[#FFBC0A] hover:after:w-full after:transition-all"
@@ -54,8 +54,8 @@ export function StorefrontHeader({ store }: { store: StorefrontDetails }) {
           </a>
         </nav>
 
-        {/* Right Action: Cart Drawer */}
-        <div className="flex items-center gap-4">
+        {/* Right Action: Cart Drawer Icon Positioned on Right */}
+        <div className="flex items-center gap-4 shrink-0">
           <CartDrawer store={store} />
         </div>
       </div>
