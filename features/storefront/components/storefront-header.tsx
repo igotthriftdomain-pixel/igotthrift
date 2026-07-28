@@ -10,7 +10,7 @@ export function StorefrontHeader({ store }: { store: StorefrontDetails }) {
       {/* Top Banner Announcement Strip */}
       <div className="bg-[#0A0A0A] text-[#FAF9F7] text-[10px] font-medium tracking-[0.2em] uppercase py-2 px-4 text-center flex items-center justify-center gap-2 border-b border-[#171717]">
         <span className="inline-block size-1 rounded-full bg-[#FAF9F7] opacity-60" />
-        <span>Curated Vintage & Streetwear Drops • Direct WhatsApp Checkout</span>
+        <span>Direct WhatsApp Checkout</span>
         <span className="inline-block size-1 rounded-full bg-[#FAF9F7] opacity-60" />
       </div>
 
