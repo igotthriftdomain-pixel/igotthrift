@@ -169,7 +169,7 @@ export function ProductCard({
                 : "bg-[#0A0A0A] hover:bg-[#171717] text-white border-[#0A0A0A] dark:bg-zinc-50 dark:hover:bg-white dark:text-zinc-950 dark:border-white active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A0A0A] focus-visible:ring-offset-2"
             }`}
           >
-            {isSoldOut ? "Sold Out" : "View Drop Item"}
+            {isSoldOut ? "Sold Out" : "View Item"}
           </Link>
         </div>
       </div>
