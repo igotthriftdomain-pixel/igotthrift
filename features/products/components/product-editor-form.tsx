@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { type Category } from "@/features/categories/types";
 import { type ProductWithCategoryAndImages } from "../types";
@@ -58,6 +58,23 @@ interface UploadedImageState {
   uploading?: boolean;
 }
 
+function areImagesEqual(
+  current: UploadedImageState[],
+  initial: { storage_path: string; display_order: number; is_primary: boolean }[]
+): boolean {
+  if (current.length !== initial.length) return false;
+  for (let i = 0; i < current.length; i++) {
+    if (
+      current[i].storage_path !== initial[i].storage_path ||
+      current[i].display_order !== initial[i].display_order ||
+      current[i].is_primary !== initial[i].is_primary
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 export function ProductEditorForm({
   productId,
   categories,
@@ -113,21 +130,56 @@ export function ProductEditorForm({
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
 
   const imageInputRef = useRef<HTMLInputElement>(null);
+  const pendingUrlRef = useRef<string | null>(null);
 
-  // Derived dirty state check
+  // Memoized initial values from props/defaults
+  const initialValues = useMemo(() => {
+    const pubDate = initialProduct?.published_at
+      ? new Date(initialProduct.published_at).toISOString().slice(0, 16)
+      : new Date().toISOString().slice(0, 16);
+
+    return {
+      name: initialProduct?.name || "",
+      slug: initialProduct?.slug || "",
+      description: initialProduct?.description || "",
+      price: initialProduct?.price ? initialProduct.price.toString() : "",
+      compareAtPrice: initialProduct?.compare_at_price ? initialProduct.compare_at_price.toString() : "",
+      sku: initialProduct?.sku || "",
+      stockQuantity: initialProduct?.stock !== undefined ? initialProduct.stock.toString() : (initialProduct?.stock_quantity ? initialProduct.stock_quantity.toString() : "0"),
+      categoryId: initialProduct?.category_id || "",
+      featured: initialProduct?.featured || false,
+      active: initialProduct?.active ?? true,
+      publishedAt: pubDate,
+      images: initialProduct?.product_images
+        ? initialProduct.product_images.map((img) => ({
+            storage_path: img.storage_path,
+            display_order: img.display_order,
+            is_primary: img.is_primary,
+          }))
+        : [],
+    };
+  }, [initialProduct]);
+
+  // Track saved state after successful save/update
+  const [savedValues, setSavedValues] = useState<typeof initialValues | null>(null);
+  const baseline = savedValues || initialValues;
+
+  // Derived dirty state check (pure state calculation during render)
   const isDirty =
-    name !== (initialProduct?.name || "") ||
-    slug !== (initialProduct?.slug || "") ||
-    description !== (initialProduct?.description || "") ||
-    price !== (initialProduct?.price ? initialProduct.price.toString() : "") ||
-    compareAtPrice !== (initialProduct?.compare_at_price ? initialProduct.compare_at_price.toString() : "") ||
-    sku !== (initialProduct?.sku || "") ||
-    stockQuantity !== (initialProduct?.stock !== undefined ? initialProduct.stock.toString() : (initialProduct?.stock_quantity ? initialProduct.stock_quantity.toString() : "0")) ||
-    categoryId !== (initialProduct?.category_id || "") ||
-    featured !== (initialProduct?.featured || false) ||
-    active !== (initialProduct?.active ?? true);
+    name !== baseline.name ||
+    slug !== baseline.slug ||
+    description !== baseline.description ||
+    price !== baseline.price ||
+    compareAtPrice !== baseline.compareAtPrice ||
+    sku !== baseline.sku ||
+    stockQuantity !== baseline.stockQuantity ||
+    categoryId !== baseline.categoryId ||
+    featured !== baseline.featured ||
+    active !== baseline.active ||
+    publishedAt !== baseline.publishedAt ||
+    !areImagesEqual(images, baseline.images);
 
-  // Unsaved changes browser beforeunload warning
+  // Unsaved changes browser beforeunload warning (for tab close / page refresh)
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (isDirty) {
@@ -139,14 +191,116 @@ export function ProductEditorForm({
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isDirty]);
 
-  // Intercept navigation if unsaved changes exist
+  // Intercept in-app navigation (sidebar links, page links, browser back/forward) when form is dirty
+  useEffect(() => {
+    if (!isDirty) return;
+
+    const handleClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+        return;
+      }
+
+      const anchor = (e.target as HTMLElement).closest("a");
+      if (!anchor) return;
+
+      const href = anchor.getAttribute("href");
+      if (!href) return;
+
+      if (
+        href.startsWith("#") ||
+        href.startsWith("javascript:") ||
+        href.startsWith("mailto:") ||
+        href.startsWith("tel:") ||
+        anchor.target === "_blank"
+      ) {
+        return;
+      }
+
+      try {
+        const targetUrl = new URL(anchor.href, window.location.href);
+        const currentUrl = new URL(window.location.href);
+
+        if (targetUrl.origin === currentUrl.origin) {
+          const targetPath = targetUrl.pathname + targetUrl.search + targetUrl.hash;
+          const currentPath = currentUrl.pathname + currentUrl.search + currentUrl.hash;
+
+          if (targetPath !== currentPath) {
+            e.preventDefault();
+            e.stopPropagation();
+            pendingUrlRef.current = targetPath;
+            setShowUnsavedDialog(true);
+          }
+        }
+      } catch {
+        // Ignore invalid URLs
+      }
+    };
+
+    const handlePopState = () => {
+      if (isDirty) {
+        window.history.pushState(null, "", window.location.href);
+        pendingUrlRef.current = "BACK";
+        setShowUnsavedDialog(true);
+      }
+    };
+
+    document.addEventListener("click", handleClick, true);
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      document.removeEventListener("click", handleClick, true);
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [isDirty]);
+
+  // Intercept navigation for Cancel / Back actions
   const handleBackOrCancel = () => {
     if (isDirty) {
+      pendingUrlRef.current = "/products";
       setShowUnsavedDialog(true);
     } else {
       router.push("/products");
     }
   };
+
+  const handleCancelDiscard = () => {
+    setShowUnsavedDialog(false);
+    pendingUrlRef.current = null;
+  };
+
+  const handleDiscardChanges = () => {
+    const destination = pendingUrlRef.current;
+    setShowUnsavedDialog(false);
+    // Reset saved values to current state to prevent further interception during navigation
+    setSavedValues({
+      name,
+      slug,
+      description,
+      price,
+      compareAtPrice,
+      sku,
+      stockQuantity,
+      categoryId,
+      featured,
+      active,
+      publishedAt,
+      images: images.map((img) => ({
+        storage_path: img.storage_path,
+        display_order: img.display_order,
+        is_primary: img.is_primary,
+      })),
+    });
+
+    if (destination === "BACK") {
+      router.back();
+    } else if (destination) {
+      router.push(destination);
+    } else {
+      router.push("/products");
+    }
+  };
+
+
 
   // Auto-slugify name
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -337,6 +491,24 @@ export function ProductEditorForm({
         : await createProductAction(productId, validation.data);
 
       if (res.success) {
+        setSavedValues({
+          name,
+          slug,
+          description,
+          price,
+          compareAtPrice,
+          sku,
+          stockQuantity,
+          categoryId,
+          featured,
+          active,
+          publishedAt,
+          images: images.map((img) => ({
+            storage_path: img.storage_path,
+            display_order: img.display_order,
+            is_primary: img.is_primary,
+          })),
+        });
         toast.success(`Product ${isEditing ? "updated" : "created"} successfully`);
         if (!isEditing) {
           router.push(`/products/${productId}/edit`);
@@ -354,6 +526,7 @@ export function ProductEditorForm({
       setSaving(false);
     }
   };
+
 
   const primaryImage = images.find((img) => img.is_primary)?.publicUrl || null;
   const descLeft = CHARACTER_LIMITS.description - description.length;
@@ -786,31 +959,29 @@ export function ProductEditorForm({
         <AlertDialogContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-zinc-900 dark:text-zinc-100 font-bold text-lg">
-              Unsaved Changes
+              Unsaved changes
             </AlertDialogTitle>
             <AlertDialogDescription className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">
-              You have unsaved changes to this product. If you leave now, your changes will be discarded.
+              You have unsaved changes. Discard them and leave this page?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex flex-col sm:flex-row gap-2 mt-4 pt-2">
             <AlertDialogCancel
-              onClick={() => setShowUnsavedDialog(false)}
-              className="border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium"
+              onClick={handleCancelDiscard}
+              className="border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-medium cursor-pointer"
             >
-              Stay & Edit
+              Cancel
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => {
-                setShowUnsavedDialog(false);
-                router.push("/products");
-              }}
-              className="bg-red-600 hover:bg-red-700 text-white font-medium px-4"
+              onClick={handleDiscardChanges}
+              className="bg-red-600 hover:bg-red-700 text-white font-medium px-4 border-0 cursor-pointer"
             >
-              Discard & Leave
+              Discard changes
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
     </div>
   );
 }

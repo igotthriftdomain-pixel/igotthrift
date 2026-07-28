@@ -35,15 +35,15 @@ export function QuantitySelector({ quantity, max, onChange }: QuantitySelectorPr
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-xs font-black text-[#0A0A0A] dark:text-[#FAF8F3] uppercase tracking-wider">
+      <span className="text-xs font-semibold text-[#111111] dark:text-[#FAF9F7] uppercase tracking-[0.15em]">
         Quantity
       </span>
-      <div className="flex items-center gap-1 w-36 border border-[#E8E2D8] dark:border-zinc-800 rounded-xl p-1 bg-white dark:bg-zinc-950 shadow-2xs">
+      <div className="flex items-center gap-1 w-36 border border-[#E7E7E5] dark:border-zinc-800 rounded-none p-1 bg-[#FFFFFF] dark:bg-zinc-950">
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="size-8 text-[#0A0A0A] dark:text-white hover:bg-[#F3EFE7] dark:hover:bg-zinc-900 shrink-0 cursor-pointer rounded-lg"
+          className="size-8 text-[#111111] dark:text-white hover:bg-[#F6F6F4] dark:hover:bg-zinc-900 shrink-0 cursor-pointer rounded-none"
           disabled={quantity <= 1}
           onClick={handleMinus}
           aria-label="Decrease quantity"
@@ -57,7 +57,7 @@ export function QuantitySelector({ quantity, max, onChange }: QuantitySelectorPr
           onChange={handleManualInput}
           min="1"
           max={max}
-          className="w-full text-center text-sm font-black text-[#0A0A0A] dark:text-[#FAF8F3] bg-transparent border-0 outline-hidden focus:ring-0 p-0 font-mono"
+          className="w-full text-center text-sm font-bold text-[#111111] dark:text-[#FAF9F7] bg-transparent border-0 outline-hidden focus:ring-0 p-0 font-mono"
           aria-label="Quantity selector input"
         />
 
@@ -65,7 +65,7 @@ export function QuantitySelector({ quantity, max, onChange }: QuantitySelectorPr
           type="button"
           variant="ghost"
           size="icon"
-          className="size-8 text-[#0A0A0A] dark:text-white hover:bg-[#F3EFE7] dark:hover:bg-zinc-900 shrink-0 cursor-pointer rounded-lg"
+          className="size-8 text-[#111111] dark:text-white hover:bg-[#F6F6F4] dark:hover:bg-zinc-900 shrink-0 cursor-pointer rounded-none"
           disabled={quantity >= max}
           onClick={handlePlus}
           aria-label="Increase quantity"
@@ -76,3 +76,4 @@ export function QuantitySelector({ quantity, max, onChange }: QuantitySelectorPr
     </div>
   );
 }
+

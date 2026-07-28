@@ -29,7 +29,7 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
 
   if (images.length === 0) {
     return (
-      <div className="aspect-square w-full rounded-2xl bg-[#F3EFE7] dark:bg-zinc-900 border border-[#E8E2D8] dark:border-zinc-800 flex items-center justify-center text-zinc-300">
+      <div className="aspect-square w-full rounded-none bg-[#F6F6F4] dark:bg-zinc-900 border border-[#E7E7E5] dark:border-zinc-800 flex items-center justify-center text-[#8A8A8A]">
         <ShoppingBag className="size-16" />
       </div>
     );
@@ -40,7 +40,7 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
   return (
     <div className="space-y-4">
       {/* Primary Display Frame with 4:5 aspect ratio */}
-      <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-[#E8E2D8] dark:border-zinc-800 bg-[#F3EFE7] dark:bg-zinc-950 flex items-center justify-center group shadow-xs">
+      <div className="relative aspect-[4/5] rounded-none overflow-hidden border border-[#E7E7E5] dark:border-zinc-800 bg-[#F6F6F4] dark:bg-zinc-950 flex items-center justify-center group shadow-none">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={activeImage.publicUrl}
@@ -54,7 +54,7 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
             <Button
               variant="outline"
               size="icon"
-              className="absolute left-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity size-9 rounded-full border-[#E8E2D8] bg-white/95 dark:bg-[#0A0A0A]/95 text-[#0A0A0A] dark:text-[#FAF8F3] cursor-pointer shadow-md"
+              className="absolute left-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity size-9 rounded-none border-[#E7E7E5] bg-[#0A0A0A] text-white hover:bg-[#171717] cursor-pointer shadow-none"
               onClick={() => setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
               aria-label="Previous image"
             >
@@ -63,7 +63,7 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
             <Button
               variant="outline"
               size="icon"
-              className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity size-9 rounded-full border-[#E8E2D8] bg-white/95 dark:bg-[#0A0A0A]/95 text-[#0A0A0A] dark:text-[#FAF8F3] cursor-pointer shadow-md"
+              className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity size-9 rounded-none border-[#E7E7E5] bg-[#0A0A0A] text-white hover:bg-[#171717] cursor-pointer shadow-none"
               onClick={() => setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
               aria-label="Next image"
             >
@@ -80,10 +80,10 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
             <button
               key={img.storagePath}
               onClick={() => setActiveIndex(idx)}
-              className={`relative size-20 shrink-0 rounded-xl overflow-hidden border-2 cursor-pointer transition-all ${
+              className={`relative size-20 shrink-0 rounded-none overflow-hidden border cursor-pointer transition-all ${
                 idx === activeIndex
-                  ? "border-[#FFBC0A] ring-2 ring-[#FFBC0A]/40"
-                  : "border-[#E8E2D8] dark:border-zinc-800 opacity-70 hover:opacity-100"
+                  ? "border-[#0A0A0A] dark:border-white ring-1 ring-[#0A0A0A]"
+                  : "border-[#E7E7E5] dark:border-zinc-800 opacity-60 hover:opacity-100"
               }`}
               aria-label={`View image thumbnail ${idx + 1}`}
             >
@@ -100,3 +100,4 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
     </div>
   );
 }
+

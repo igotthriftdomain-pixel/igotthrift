@@ -49,14 +49,14 @@ export function Sidebar() {
 
   const renderNavContent = (onNavClick?: () => void) => (
     <div className="flex flex-col h-full bg-zinc-950 text-zinc-200">
-      <div className="p-6 border-b border-zinc-900 flex items-center justify-between">
+      <div className="p-6 border-b border-zinc-900 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3 min-w-0">
           <div className="size-9 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center shrink-0">
             <Store className="size-5 text-zinc-100" />
           </div>
           <div className="min-w-0">
             <h1 className="font-bold text-zinc-100 truncate text-sm">{store.name}</h1>
-            <p className="text-xs text-zinc-400">Merchant Portal</p>
+            <p className="text-xs text-zinc-400 truncate">iGotThrift Merchant Portal</p>
           </div>
         </div>
       </div>
@@ -84,10 +84,11 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="p-4 border-t border-zinc-900 space-y-2">
+      <div className="p-4 border-t border-zinc-900 space-y-2 shrink-0">
         <Link
           href={`/store/${store.slug}`}
           target="_blank"
+          onClick={onNavClick}
           className="flex items-center justify-between px-3 py-2 text-xs font-medium text-zinc-400 hover:text-zinc-200 rounded-md hover:bg-zinc-900/50 transition-colors"
         >
           <span className="flex items-center gap-2">
@@ -98,8 +99,11 @@ export function Sidebar() {
 
         <Button
           variant="destructive"
-          className="w-full justify-start gap-3 bg-red-950/20 text-red-400 border border-red-950/50 hover:bg-red-950/50 text-xs py-2"
-          onClick={handleLogout}
+          className="w-full justify-start gap-3 bg-red-950/20 text-red-400 border border-red-950/50 hover:bg-red-950/50 text-xs py-2 cursor-pointer"
+          onClick={() => {
+            if (onNavClick) onNavClick();
+            handleLogout();
+          }}
           disabled={loading}
         >
           <LogOut className="size-4" />
@@ -112,7 +116,7 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop Permanent Sidebar */}
-      <aside className="hidden md:flex w-64 bg-zinc-950 border-r border-zinc-900 text-zinc-200 flex-col min-h-screen shrink-0">
+      <aside className="hidden md:flex w-64 bg-zinc-950 border-r border-zinc-900 text-zinc-200 flex-col h-full shrink-0">
         {renderNavContent()}
       </aside>
 

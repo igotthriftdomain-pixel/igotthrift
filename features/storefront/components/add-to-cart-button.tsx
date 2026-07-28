@@ -15,14 +15,14 @@ export function AddToCartButton({ disabled, loading, onClick }: AddToCartButtonP
       type="button"
       disabled={disabled || loading}
       onClick={onClick}
-      className="w-full md:w-auto md:px-10 h-12 rounded-xl bg-[#F36B00] hover:bg-[#e06200] text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md active:scale-98 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none border-0"
+      className="w-full md:w-auto md:px-10 h-12 rounded-none bg-[#0A0A0A] hover:bg-[#171717] text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-[#0A0A0A] font-semibold text-xs uppercase tracking-[0.15em] transition-all active:scale-98 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:pointer-events-none border-0"
       aria-busy={loading}
       aria-live="polite"
     >
       {loading ? (
         <>
           <Loader2 className="size-4 animate-spin" />
-          <span>Adding to Drop Bag...</span>
+          <span>Adding to Bag...</span>
         </>
       ) : (
         <>
@@ -33,3 +33,4 @@ export function AddToCartButton({ disabled, loading, onClick }: AddToCartButtonP
     </Button>
   );
 }
+

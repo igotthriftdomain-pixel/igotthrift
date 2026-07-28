@@ -32,11 +32,11 @@ export default async function MerchantLayout({
 
   return (
     <MerchantProvider profile={profile} store={store}>
-      <div className="flex flex-col md:flex-row min-h-screen bg-zinc-50 dark:bg-zinc-950 font-sans">
+      <div className="flex flex-col md:flex-row h-screen md:h-dvh bg-zinc-50 dark:bg-zinc-950 font-sans overflow-hidden">
         <Sidebar />
-        <div className="flex-1 flex flex-col min-h-screen min-w-0">
+        <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden">
           <Header />
-          <main className="flex-1 p-4 md:p-8 overflow-y-auto">{children}</main>
+          <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto">{children}</main>
         </div>
       </div>
     </MerchantProvider>

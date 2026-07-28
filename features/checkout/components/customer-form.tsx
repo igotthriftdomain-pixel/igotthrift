@@ -22,7 +22,7 @@ export function CustomerForm({ details, errors, onChange, disabled }: CustomerFo
   return (
     <div className="space-y-4">
       <div className="space-y-1.5 text-left">
-        <Label htmlFor="name" className="text-xs font-extrabold uppercase tracking-wider text-[#0A0A0A] dark:text-[#FAF8F3]">
+        <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-[0.15em] text-[#111111] dark:text-[#FAF9F7]">
           Full Name
         </Label>
         <Input
@@ -32,17 +32,17 @@ export function CustomerForm({ details, errors, onChange, disabled }: CustomerFo
           onChange={(e) => onChange("name", e.target.value)}
           placeholder="e.g. Alex Sharma"
           disabled={disabled}
-          className="h-10 bg-white dark:bg-zinc-900 border-[#E8E2D8] dark:border-zinc-800 text-[#0A0A0A] dark:text-[#FAF8F3] text-sm focus:border-[#FFBC0A]"
+          className="h-10 bg-[#FFFFFF] dark:bg-zinc-900 border-[#E7E7E5] dark:border-zinc-800 text-[#111111] dark:text-[#FAF9F7] text-sm focus:border-[#0A0A0A] rounded-none"
         />
         {errors.name && (
-          <p className="text-xs text-red-500 font-semibold" role="alert">
+          <p className="text-xs text-red-600 font-medium" role="alert">
             {errors.name}
           </p>
         )}
       </div>
 
       <div className="space-y-1.5 text-left">
-        <Label htmlFor="phone" className="text-xs font-extrabold uppercase tracking-wider text-[#0A0A0A] dark:text-[#FAF8F3]">
+        <Label htmlFor="phone" className="text-xs font-semibold uppercase tracking-[0.15em] text-[#111111] dark:text-[#FAF9F7]">
           Phone Number
         </Label>
         <Input
@@ -52,17 +52,17 @@ export function CustomerForm({ details, errors, onChange, disabled }: CustomerFo
           onChange={(e) => onChange("phone", e.target.value)}
           placeholder="e.g. 9876543210"
           disabled={disabled}
-          className="h-10 bg-white dark:bg-zinc-900 border-[#E8E2D8] dark:border-zinc-800 text-[#0A0A0A] dark:text-[#FAF8F3] text-sm focus:border-[#FFBC0A]"
+          className="h-10 bg-[#FFFFFF] dark:bg-[#FAF9F7] border-[#E7E7E5] dark:border-zinc-800 text-[#111111] dark:text-[#FAF9F7] text-sm focus:border-[#0A0A0A] rounded-none"
         />
         {errors.phone && (
-          <p className="text-xs text-red-500 font-semibold" role="alert">
+          <p className="text-xs text-red-600 font-medium" role="alert">
             {errors.phone}
           </p>
         )}
       </div>
 
       <div className="space-y-1.5 text-left">
-        <Label htmlFor="address" className="text-xs font-extrabold uppercase tracking-wider text-[#0A0A0A] dark:text-[#FAF8F3]">
+        <Label htmlFor="address" className="text-xs font-semibold uppercase tracking-[0.15em] text-[#111111] dark:text-[#FAF9F7]">
           Delivery Address
         </Label>
         <Textarea
@@ -72,10 +72,10 @@ export function CustomerForm({ details, errors, onChange, disabled }: CustomerFo
           placeholder="Enter complete house no., street name, landmark, pin code..."
           disabled={disabled}
           rows={3}
-          className="bg-white dark:bg-zinc-900 border-[#E8E2D8] dark:border-zinc-800 text-[#0A0A0A] dark:text-[#FAF8F3] text-sm focus:border-[#FFBC0A]"
+          className="bg-[#FFFFFF] dark:bg-zinc-900 border-[#E7E7E5] dark:border-zinc-800 text-[#111111] dark:text-[#FAF9F7] text-sm focus:border-[#0A0A0A] rounded-none"
         />
         {errors.address && (
-          <p className="text-xs text-red-500 font-semibold" role="alert">
+          <p className="text-xs text-red-600 font-medium" role="alert">
             {errors.address}
           </p>
         )}
@@ -83,3 +83,4 @@ export function CustomerForm({ details, errors, onChange, disabled }: CustomerFo
     </div>
   );
 }
+

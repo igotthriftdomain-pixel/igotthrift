@@ -20,23 +20,27 @@ export default async function StorefrontLayout({ children, params }: LayoutProps
   }
 
   const themeStyle = {
-    "--store-theme": store.themeColor || "#FFBC0A",
-    "--store-yellow": "#FFBC0A",
-    "--store-orange": "#F36B00",
-    "--store-dark": "#0A0A0A",
-    "--store-cream": "#FAF8F3",
-    "--store-surface": "#F3EFE7",
-    "--store-border": "rgba(10, 10, 10, 0.10)",
-    "--store-primary": store.themeColor || "#FFBC0A",
-    "--store-primary-hover": `color-mix(in srgb, ${store.themeColor || "#FFBC0A"} 85%, black)`,
-    "--store-primary-foreground": "#0A0A0A",
+    "--store-theme": "#0A0A0A",
+    "--store-black": "#0A0A0A",
+    "--store-soft-black": "#171717",
+    "--store-white": "#FFFFFF",
+    "--store-off-white": "#FAF9F7",
+    "--store-surface": "#F6F6F4",
+    "--store-text-primary": "#111111",
+    "--store-text-secondary": "#666666",
+    "--store-text-muted": "#8A8A8A",
+    "--store-border": "#E7E7E5",
+    "--store-strong-border": "#D4D4D2",
+    "--store-primary": "#0A0A0A",
+    "--store-primary-hover": "#171717",
+    "--store-primary-foreground": "#FFFFFF",
   } as React.CSSProperties;
 
   return (
     <CartProvider storeId={store.id}>
       <div
         style={themeStyle}
-        className="min-h-screen flex flex-col bg-[#FAF8F3] dark:bg-[#0A0A0A] text-[#0A0A0A] dark:text-[#FAF8F3] font-sans antialiased selection:bg-[#FFBC0A] selection:text-[#0A0A0A]"
+        className="min-h-screen flex flex-col bg-[#FAF9F7] dark:bg-[#0A0A0A] text-[#111111] dark:text-[#FAF9F7] font-sans antialiased selection:bg-[#0A0A0A] selection:text-[#FFFFFF]"
       >
         <StorefrontHeader store={store} />
         <main className="flex-1">{children}</main>
@@ -45,3 +49,4 @@ export default async function StorefrontLayout({ children, params }: LayoutProps
     </CartProvider>
   );
 }
+

@@ -35,41 +35,41 @@ const FacebookIcon = ({ className }: { className?: string }) => (
 
 export function StorefrontFooter({ store }: { store: StorefrontDetails }) {
   return (
-    <footer className="border-t border-zinc-800 bg-[#0A0A0A] py-16 text-zinc-400 text-sm">
+    <footer className="border-t border-[#171717] bg-[#0A0A0A] py-16 text-[#8A8A8A] text-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid gap-10 md:grid-cols-3">
         {/* Branding & description */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
             {store.logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={store.logoUrl} alt={store.name} className="size-8 rounded-full object-cover border border-[#FFBC0A]" />
+              <img src={store.logoUrl} alt={store.name} className="size-8 rounded-full object-cover border border-[#FAF9F7]" />
             ) : (
-              <div className="size-8 rounded-full bg-[#FFBC0A] text-[#0A0A0A] flex items-center justify-center font-black text-xs uppercase">
+              <div className="size-8 rounded-full bg-[#171717] text-[#FAF9F7] flex items-center justify-center font-bold text-xs uppercase border border-[#FAF9F7]/30">
                 {store.name.substring(0, 2)}
               </div>
             )}
-            <h4 className="font-black text-[#FAF8F3] text-lg tracking-tight uppercase">{store.name}</h4>
+            <h4 className="font-bold text-[#FAF9F7] text-lg tracking-tight uppercase">{store.name}</h4>
           </div>
-          <p className="text-xs text-zinc-400 leading-relaxed max-w-sm">
+          <p className="text-xs text-[#8A8A8A] leading-relaxed max-w-sm">
             {store.description || "Curated vintage thrift & streetwear drops. Hand-checked for quality & authenticity with seamless WhatsApp ordering."}
           </p>
         </div>
 
         {/* Contact/Address */}
         <div className="space-y-4">
-          <h4 className="font-extrabold text-[#FFBC0A] text-xs uppercase tracking-widest">Store Location & Contact</h4>
-          <div className="space-y-2.5 text-xs text-zinc-300">
+          <h4 className="font-semibold text-[#FAF9F7] text-xs uppercase tracking-[0.2em]">Store Location & Contact</h4>
+          <div className="space-y-2.5 text-xs text-[#D4D4D2]">
             {store.address ? (
               <p className="flex items-start gap-2">
-                <MapPin className="size-4 shrink-0 text-[#FFBC0A] mt-0.5" />
+                <MapPin className="size-4 shrink-0 text-[#FAF9F7] mt-0.5" />
                 <span>{store.address}</span>
               </p>
             ) : (
-              <p className="text-zinc-500">Online Boutique Store</p>
+              <p className="text-[#8A8A8A]">Online Boutique Store</p>
             )}
             {store.whatsappNumber && (
               <p className="flex items-start gap-2">
-                <Send className="size-4 shrink-0 text-[#FFBC0A] mt-0.5" />
+                <Send className="size-4 shrink-0 text-[#FAF9F7] mt-0.5" />
                 <span>WhatsApp: {store.whatsappNumber}</span>
               </p>
             )}
@@ -78,14 +78,14 @@ export function StorefrontFooter({ store }: { store: StorefrontDetails }) {
 
         {/* Social connections */}
         <div className="space-y-4">
-          <h4 className="font-extrabold text-[#FFBC0A] text-xs uppercase tracking-widest">Connect With Us</h4>
-          <div className="flex gap-4 text-zinc-400">
+          <h4 className="font-semibold text-[#FAF9F7] text-xs uppercase tracking-[0.2em]">Connect With Us</h4>
+          <div className="flex gap-4 text-[#8A8A8A]">
             {store.instagram && (
               <a
                 href={store.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="size-9 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:text-[#FFBC0A] hover:border-[#FFBC0A] transition-colors"
+                className="size-9 rounded-full bg-[#171717] border border-zinc-800 flex items-center justify-center hover:text-white hover:border-white transition-colors"
                 aria-label="Instagram Link"
               >
                 <InstagramIcon className="size-4" />
@@ -96,7 +96,7 @@ export function StorefrontFooter({ store }: { store: StorefrontDetails }) {
                 href={store.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="size-9 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:text-[#FFBC0A] hover:border-[#FFBC0A] transition-colors"
+                className="size-9 rounded-full bg-[#171717] border border-zinc-800 flex items-center justify-center hover:text-white hover:border-white transition-colors"
                 aria-label="Facebook Link"
               >
                 <FacebookIcon className="size-4" />
@@ -107,7 +107,7 @@ export function StorefrontFooter({ store }: { store: StorefrontDetails }) {
                 href={store.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="size-9 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center hover:text-[#FFBC0A] hover:border-[#FFBC0A] transition-colors"
+                className="size-9 rounded-full bg-[#171717] border border-zinc-800 flex items-center justify-center hover:text-white hover:border-white transition-colors"
                 aria-label="Store Website Link"
               >
                 <Globe className="size-4" />
@@ -117,9 +117,10 @@ export function StorefrontFooter({ store }: { store: StorefrontDetails }) {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-zinc-900 text-center text-xs text-zinc-500">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 pt-8 border-t border-[#171717] text-center text-xs text-[#666666]">
         <p>&copy; {new Date().getFullYear()} {store.name}. All rights reserved.</p>
       </div>
     </footer>
   );
 }
+

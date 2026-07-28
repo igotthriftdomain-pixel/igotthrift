@@ -87,20 +87,20 @@ export function CheckoutSheet({ store }: { store: StorefrontDetails }) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
-        className="w-full h-12 inline-flex items-center justify-center rounded-xl bg-[#F36B00] hover:bg-[#e06200] text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer focus:outline-hidden active:scale-98"
+        className="w-full h-12 inline-flex items-center justify-center rounded-none bg-[#0A0A0A] hover:bg-[#171717] text-white dark:bg-white dark:text-[#0A0A0A] dark:hover:bg-zinc-200 font-semibold text-xs uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 cursor-pointer focus:outline-hidden active:scale-98"
         aria-label="Proceed to checkout sheet"
       >
         <MessageSquareCode className="size-4" />
         <span>Checkout with WhatsApp</span>
       </SheetTrigger>
 
-      <SheetContent className="w-full sm:max-w-md flex flex-col h-full bg-[#FAF8F3] dark:bg-[#0A0A0A] p-0 border-l border-[#E8E2D8] dark:border-zinc-800">
-        <SheetHeader className="p-6 border-b border-[#E8E2D8] dark:border-zinc-800 bg-white dark:bg-zinc-950 flex flex-row items-center justify-between">
+      <SheetContent className="w-full sm:max-w-md flex flex-col h-full bg-[#FAF9F7] dark:bg-[#0A0A0A] p-0 border-l border-[#E7E7E5] dark:border-zinc-800">
+        <SheetHeader className="p-6 border-b border-[#E7E7E5] dark:border-zinc-800 bg-[#FFFFFF] dark:bg-zinc-950 flex flex-row items-center justify-between">
           <div className="space-y-0.5 text-left">
-            <SheetTitle className="text-lg font-black text-[#0A0A0A] dark:text-[#FAF8F3] uppercase tracking-tight">
+            <SheetTitle className="text-base font-bold text-[#111111] dark:text-[#FAF9F7] uppercase tracking-[0.15em]">
               Customer Details
             </SheetTitle>
-            <SheetDescription className="text-xs text-zinc-500 font-medium">
+            <SheetDescription className="text-xs text-[#666666] font-normal tracking-wide">
               Provide delivery details to submit your WhatsApp order
             </SheetDescription>
           </div>
@@ -123,11 +123,11 @@ export function CheckoutSheet({ store }: { store: StorefrontDetails }) {
             />
           </div>
 
-          <div className="space-y-2.5 pt-6 border-t border-[#E8E2D8] dark:border-zinc-800">
+          <div className="space-y-2.5 pt-6 border-t border-[#E7E7E5] dark:border-zinc-800">
             <Button
               type="submit"
               disabled={loading || items.length === 0}
-              className="w-full h-12 rounded-xl bg-[#F36B00] hover:bg-[#e06200] text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-98 border-0"
+              className="w-full h-12 rounded-none bg-[#0A0A0A] hover:bg-[#171717] text-white dark:bg-white dark:hover:bg-zinc-200 dark:text-[#0A0A0A] font-semibold text-xs uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-98 border-0"
             >
               {loading ? (
                 <>
@@ -142,7 +142,7 @@ export function CheckoutSheet({ store }: { store: StorefrontDetails }) {
               )}
             </Button>
 
-            <SheetClose className="w-full h-10 inline-flex items-center justify-center rounded-xl border border-[#E8E2D8] dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-900 hover:bg-[#F3EFE7] dark:hover:bg-zinc-800 font-extrabold text-xs uppercase tracking-wider cursor-pointer transition-all">
+            <SheetClose className="w-full h-10 inline-flex items-center justify-center rounded-none border border-[#E7E7E5] dark:border-zinc-800 text-[#111111] dark:text-zinc-300 bg-[#FFFFFF] dark:bg-zinc-900 hover:bg-[#F6F6F4] dark:hover:bg-zinc-800 font-semibold text-xs uppercase tracking-[0.15em] cursor-pointer transition-all">
               <ArrowLeft className="size-3.5 mr-1.5" /> Back to Cart
             </SheetClose>
           </div>
@@ -151,3 +151,4 @@ export function CheckoutSheet({ store }: { store: StorefrontDetails }) {
     </Sheet>
   );
 }
+

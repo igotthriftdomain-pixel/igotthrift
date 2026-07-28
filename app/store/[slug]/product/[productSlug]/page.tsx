@@ -11,9 +11,8 @@ import {
 import { ProductGallery } from "@/features/storefront/components/product-gallery";
 import { ProductPurchaseControls } from "@/features/storefront/components/product-purchase-controls";
 import { ProductGrid } from "@/features/storefront/components/product-grid";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Sparkles, Calendar, ArrowLeft, ShieldCheck, Truck } from "lucide-react";
+import { Calendar, ArrowLeft, ShieldCheck, Truck } from "lucide-react";
 import { type StorefrontDetails, type StorefrontProduct } from "@/features/storefront/types";
 
 interface PageProps {
@@ -69,9 +68,9 @@ export default async function ProductDetailsPage({ params }: PageProps) {
       <div>
         <Link
           href={`/store/${store.slug}`}
-          className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-zinc-500 hover:text-[#0A0A0A] dark:hover:text-[#FAF8F3] transition-colors"
+          className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-[#666666] hover:text-[#111111] dark:hover:text-[#FAF9F7] transition-colors"
         >
-          <ArrowLeft className="size-3.5 text-[#F36B00]" /> Back to Collection Catalog
+          <ArrowLeft className="size-3.5 text-[#111111] dark:text-white" /> Back to Catalog
         </Link>
       </div>
 
@@ -90,14 +89,14 @@ export default async function ProductDetailsPage({ params }: PageProps) {
             {/* Badges overlay */}
             <div className="flex flex-wrap gap-2">
               {product.featured && (
-                <Badge className="bg-[#FFBC0A] text-[#0A0A0A] border-0 text-[10px] py-1 px-2.5 font-extrabold uppercase tracking-widest flex items-center gap-1.5 shadow-xs">
-                  <Sparkles className="size-3 text-[#0A0A0A] fill-current" /> Featured Drop
-                </Badge>
+                <span className="bg-[#0A0A0A] text-[#FFFFFF] text-[9px] py-1 px-2.5 font-semibold uppercase tracking-[0.2em] shadow-none">
+                  Featured Drop
+                </span>
               )}
               {product.publishedAt && new Date(product.publishedAt) > new Date() && (
-                <Badge className="bg-blue-600 text-white border-0 text-[10px] py-1 px-2.5 font-extrabold uppercase tracking-widest flex items-center gap-1.5">
+                <span className="bg-[#171717] text-[#FAF9F7] text-[9px] py-1 px-2.5 font-semibold uppercase tracking-[0.2em] flex items-center gap-1.5">
                   <Calendar className="size-3" /> Scheduled
-                </Badge>
+                </span>
               )}
             </div>
 
@@ -106,38 +105,38 @@ export default async function ProductDetailsPage({ params }: PageProps) {
               {product.categoryName && product.categorySlug && (
                 <Link
                   href={`/store/${store.slug}?category=${product.categorySlug}#products-catalog`}
-                  className="text-xs font-extrabold text-[#F36B00] uppercase tracking-widest hover:underline block"
+                  className="text-xs font-semibold text-[#8A8A8A] uppercase tracking-[0.2em] hover:text-[#111111] block transition-colors"
                 >
                   {product.categoryName}
                 </Link>
               )}
-              <h1 className="text-3xl sm:text-5xl font-black text-[#0A0A0A] dark:text-[#FAF8F3] tracking-tight leading-tight">
+              <h1 className="text-3xl sm:text-5xl font-bold text-[#111111] dark:text-[#FAF9F7] tracking-tight leading-tight">
                 {product.name}
               </h1>
             </div>
           </div>
 
           {/* Price details */}
-          <div className="space-y-2 pb-6 border-b border-[#E8E2D8] dark:border-zinc-800">
+          <div className="space-y-2 pb-6 border-b border-[#E7E7E5] dark:border-zinc-800">
             <div className="flex items-baseline gap-4">
-              <span className="text-3xl sm:text-4xl font-black text-[#0A0A0A] dark:text-[#FAF8F3]">
+              <span className="text-3xl sm:text-4xl font-bold text-[#111111] dark:text-[#FAF9F7]">
                 {store.currencySymbol}
                 {product.price.toLocaleString("en-IN")}
               </span>
               {product.compareAtPrice && product.compareAtPrice > product.price && (
                 <>
-                  <span className="text-lg text-zinc-400 line-through font-medium">
+                  <span className="text-lg text-[#8A8A8A] line-through font-normal">
                     {store.currencySymbol}
                     {product.compareAtPrice.toLocaleString("en-IN")}
                   </span>
-                  <Badge className="bg-[#F36B00] text-white border-0 text-[10px] font-extrabold uppercase tracking-wider">
+                  <span className="bg-[#0A0A0A] text-white text-[9px] font-semibold uppercase tracking-[0.15em] py-1 px-2.5">
                     Save {Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}%
-                  </Badge>
+                  </span>
                 </>
               )}
             </div>
             {product.sku && (
-              <p className="text-[11px] text-zinc-400 font-extrabold tracking-widest font-mono uppercase">
+              <p className="text-[10px] text-[#8A8A8A] font-medium tracking-[0.2em] font-mono uppercase">
                 ITEM SKU: {product.sku}
               </p>
             )}
@@ -145,7 +144,7 @@ export default async function ProductDetailsPage({ params }: PageProps) {
 
           {/* Short Description */}
           {product.shortDescription && (
-            <p className="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed border-l-3 border-[#FFBC0A] pl-4 py-1 italic font-serif">
+            <p className="text-[#666666] dark:text-zinc-300 text-sm leading-relaxed border-l-2 border-[#0A0A0A] dark:border-white pl-4 py-1 italic font-serif">
               &ldquo;{product.shortDescription}&rdquo;
             </p>
           )}
@@ -153,23 +152,23 @@ export default async function ProductDetailsPage({ params }: PageProps) {
           {/* Description */}
           {product.description && (
             <div className="space-y-2">
-              <h3 className="text-xs font-extrabold text-[#0A0A0A] dark:text-[#FAF8F3] uppercase tracking-wider">
+              <h3 className="text-xs font-semibold text-[#111111] dark:text-[#FAF9F7] uppercase tracking-[0.15em]">
                 Item Description & Details
               </h3>
-              <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed whitespace-pre-line font-normal">
+              <p className="text-[#666666] dark:text-zinc-400 text-sm leading-relaxed whitespace-pre-line font-normal">
                 {product.description}
               </p>
             </div>
           )}
 
           {/* Key Value Trust Chips */}
-          <div className="grid grid-cols-2 gap-3 py-2 border-y border-[#E8E2D8] dark:border-zinc-800 text-xs">
-            <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-300 font-semibold">
-              <ShieldCheck className="size-4 text-[#FFBC0A]" />
+          <div className="grid grid-cols-2 gap-3 py-3 border-y border-[#E7E7E5] dark:border-zinc-800 text-xs">
+            <div className="flex items-center gap-2 text-[#666666] dark:text-zinc-300 font-medium">
+              <ShieldCheck className="size-4 text-[#111111] dark:text-white" />
               <span>100% Authentic Quality</span>
             </div>
-            <div className="flex items-center gap-2 text-zinc-600 dark:text-zinc-300 font-semibold">
-              <Truck className="size-4 text-[#F36B00]" />
+            <div className="flex items-center gap-2 text-[#666666] dark:text-zinc-300 font-medium">
+              <Truck className="size-4 text-[#111111] dark:text-white" />
               <span>Direct WhatsApp Routing</span>
             </div>
           </div>
@@ -207,7 +206,7 @@ async function RelatedProductsWrapper({
   if (related.length === 0) return null;
 
   return (
-    <div className="pt-12 border-t border-[#E8E2D8] dark:border-zinc-800">
+    <div className="pt-12 border-t border-[#E7E7E5] dark:border-zinc-800">
       <ProductGrid products={related} store={store} title="You May Also Like" />
     </div>
   );
@@ -217,10 +216,10 @@ async function RelatedProductsWrapper({
 function GallerySkeleton() {
   return (
     <div className="space-y-4">
-      <Skeleton className="aspect-[4/5] w-full rounded-2xl bg-[#E8E2D8] dark:bg-zinc-800" />
+      <Skeleton className="aspect-[4/5] w-full bg-[#E7E7E5] dark:bg-zinc-800" />
       <div className="flex gap-3">
-        <Skeleton className="size-20 rounded-xl bg-[#E8E2D8] dark:bg-zinc-800" />
-        <Skeleton className="size-20 rounded-xl bg-[#E8E2D8] dark:bg-zinc-800" />
+        <Skeleton className="size-20 bg-[#E7E7E5] dark:bg-zinc-800" />
+        <Skeleton className="size-20 bg-[#E7E7E5] dark:bg-zinc-800" />
       </div>
     </div>
   );
@@ -228,19 +227,19 @@ function GallerySkeleton() {
 
 function GridSkeleton() {
   return (
-    <div className="space-y-4 pt-10 border-t border-[#E8E2D8] dark:border-zinc-800">
-      <Skeleton className="h-6 w-48 bg-[#E8E2D8] dark:bg-zinc-800" />
+    <div className="space-y-4 pt-10 border-t border-[#E7E7E5] dark:border-zinc-800">
+      <Skeleton className="h-6 w-48 bg-[#E7E7E5] dark:bg-zinc-800" />
       <div className="grid gap-6 grid-cols-2 md:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="border border-[#E8E2D8] dark:border-zinc-800 rounded-2xl overflow-hidden p-3 space-y-4 bg-white dark:bg-zinc-900"
+            className="border border-[#E7E7E5] dark:border-zinc-800 overflow-hidden p-3 space-y-4 bg-white dark:bg-zinc-900"
           >
-            <Skeleton className="aspect-[4/5] w-full rounded-xl bg-[#E8E2D8] dark:bg-zinc-800" />
-            <Skeleton className="h-4 w-3/4 bg-[#E8E2D8] dark:bg-zinc-800" />
+            <Skeleton className="aspect-[4/5] w-full bg-[#E7E7E5] dark:bg-zinc-800" />
+            <Skeleton className="h-4 w-3/4 bg-[#E7E7E5] dark:bg-zinc-800" />
             <div className="flex justify-between items-center">
-              <Skeleton className="h-5 w-16 bg-[#E8E2D8] dark:bg-zinc-800" />
-              <Skeleton className="h-9 w-24 rounded-xl bg-[#E8E2D8] dark:bg-zinc-800" />
+              <Skeleton className="h-5 w-16 bg-[#E7E7E5] dark:bg-zinc-800" />
+              <Skeleton className="h-9 w-24 bg-[#E7E7E5] dark:bg-zinc-800" />
             </div>
           </div>
         ))}
@@ -248,3 +247,4 @@ function GridSkeleton() {
     </div>
   );
 }
+

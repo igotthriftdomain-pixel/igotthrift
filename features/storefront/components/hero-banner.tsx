@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { type StorefrontDetails, type HeroBannerSlide } from "../types";
 import { MOCK_BANNER_URL } from "../constants";
-import { Sparkles, ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 
 export function HeroBanner({
   store,
@@ -40,7 +40,7 @@ export function HeroBanner({
   }, [slides.length]);
 
   return (
-    <section className="relative min-h-[480px] lg:min-h-[520px] flex items-center justify-center overflow-hidden bg-[#0A0A0A] text-white py-16 px-4 sm:px-6 lg:px-8">
+    <section className="relative min-h-[500px] lg:min-h-[560px] flex items-center justify-center overflow-hidden bg-[#0A0A0A] text-white py-20 px-4 sm:px-6 lg:px-8 border-b border-[#E7E7E5] dark:border-zinc-800">
       {/* Background Media & Editorial Gradient overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         {slides.map((slide, index) => {
@@ -59,29 +59,29 @@ export function HeroBanner({
                   muted
                   loop
                   playsInline
-                  className="w-full h-full object-cover opacity-45 scale-105"
+                  className="w-full h-full object-cover opacity-50 scale-105"
                 />
               ) : (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={slide.url}
                   alt={`${store.name} Hero Slide ${index + 1}`}
-                  className="w-full h-full object-cover opacity-40 scale-105"
+                  className="w-full h-full object-cover opacity-45 scale-105"
                 />
               )}
             </div>
           );
         })}
-        {/* Layered vignette and warm gradient mask */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/60 to-black/30 z-20" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(10,10,10,0.7)_100%)] z-20" />
+        {/* Layered vignette and dark gradient mask */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/70 to-black/40 z-20" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(10,10,10,0.75)_100%)] z-20" />
       </div>
 
-      <div className="relative z-30 max-w-4xl mx-auto text-center space-y-7 flex flex-col items-center">
+      <div className="relative z-30 max-w-4xl mx-auto text-center space-y-8 flex flex-col items-center">
         {/* Editorial Pill Chip */}
-        <div className="inline-flex items-center gap-2 bg-[#FFBC0A]/10 border border-[#FFBC0A]/30 text-[#FFBC0A] px-3.5 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest backdrop-blur-xs">
-          <Sparkles className="size-3.5 text-[#FFBC0A]" />
-          <span>Curated Vintage Collection</span>
+        <div className="inline-flex items-center gap-2 bg-[#FAF9F7]/10 border border-[#FAF9F7]/25 text-[#FAF9F7] px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-[0.25em] backdrop-blur-md">
+          <span className="inline-block size-1.5 rounded-full bg-[#FAF9F7]" />
+          <span>Curated Drop Collection</span>
         </div>
 
         {/* Store Logo */}
@@ -90,20 +90,20 @@ export function HeroBanner({
           <img
             src={store.logoUrl}
             alt={store.name}
-            className="size-24 rounded-full object-cover border-4 border-[#0A0A0A] ring-2 ring-[#FFBC0A]/50 shadow-2xl"
+            className="size-24 rounded-full object-cover border-2 border-[#FAF9F7]/30 ring-1 ring-white/10 shadow-2xl"
           />
         ) : (
-          <div className="size-24 rounded-full bg-[#0A0A0A] text-[#FFBC0A] flex items-center justify-center font-black text-3xl border-4 border-[#0A0A0A] ring-2 ring-[#FFBC0A]/50 shadow-2xl uppercase tracking-tighter">
+          <div className="size-24 rounded-full bg-[#171717] text-[#FAF9F7] flex items-center justify-center font-semibold text-2xl border-2 border-[#FAF9F7]/30 ring-1 ring-white/10 shadow-2xl uppercase tracking-wider">
             {store.name.substring(0, 2)}
           </div>
         )}
 
         {/* Store Name & Description */}
         <div className="space-y-3 max-w-2xl">
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-[#FAF8F3] drop-shadow-lg leading-none">
+          <h1 className="text-3xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#FAF9F7] leading-none break-words max-w-full">
             {store.name}
           </h1>
-          <p className="text-zinc-300 text-sm sm:text-base leading-relaxed drop-shadow-sm font-normal max-w-xl mx-auto">
+          <p className="text-[#D4D4D2] text-sm sm:text-base leading-relaxed font-normal max-w-xl mx-auto tracking-wide">
             {store.description || "Discover exclusive vintage fashion drops and handpicked streetwear statement pieces."}
           </p>
         </div>
@@ -112,7 +112,7 @@ export function HeroBanner({
         <div className="pt-2 flex flex-col sm:flex-row gap-4 items-center">
           <a
             href="#products-catalog"
-            className="inline-flex items-center justify-center rounded-xl bg-[#F36B00] hover:bg-[#e06200] text-white text-xs font-bold uppercase tracking-wider px-8 h-12 transition-all shadow-xl active:scale-95 gap-2 border border-[#F36B00]"
+            className="inline-flex items-center justify-center rounded-none bg-[#FFFFFF] hover:bg-[#FAF9F7] text-[#0A0A0A] text-xs font-bold uppercase tracking-[0.2em] px-6 sm:px-9 h-12 transition-all shadow-md active:scale-98 gap-2 border border-[#FFFFFF] max-w-full"
           >
             <span>Explore Collection</span>
             <ArrowRight className="size-4" />
@@ -121,16 +121,16 @@ export function HeroBanner({
 
         {/* Statistics section */}
         {totalProducts !== undefined && totalProducts > 0 && (
-          <div className="pt-6 flex justify-center gap-10 border-t border-white/10 w-full max-w-md mt-6">
+          <div className="pt-6 flex justify-center gap-12 border-t border-white/15 w-full max-w-md mt-4">
             <div className="text-center">
-              <span className="block text-2xl font-black text-[#FFBC0A]">{totalProducts}</span>
-              <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Available Items</span>
+              <span className="block text-2xl font-bold text-[#FAF9F7] tracking-tight">{totalProducts}</span>
+              <span className="text-[10px] text-[#8A8A8A] font-medium uppercase tracking-[0.2em]">Available Items</span>
             </div>
             <div className="text-center">
-              <span className="block text-2xl font-black text-[#FFBC0A] flex items-center justify-center gap-1">
-                100% <ShieldCheck className="size-4 text-[#FFBC0A]" />
+              <span className="block text-2xl font-bold text-[#FAF9F7] tracking-tight flex items-center justify-center gap-1.5">
+                100% <ShieldCheck className="size-4 text-[#FAF9F7]" />
               </span>
-              <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Hand-Curated</span>
+              <span className="text-[10px] text-[#8A8A8A] font-medium uppercase tracking-[0.2em]">Hand-Curated</span>
             </div>
           </div>
         )}
@@ -143,10 +143,10 @@ export function HeroBanner({
                 key={idx}
                 type="button"
                 onClick={() => setCurrentSlideIndex(idx)}
-                className={`h-2 rounded-full transition-all cursor-pointer ${
+                className={`h-1.5 rounded-full transition-all cursor-pointer ${
                   idx === currentSlideIndex
-                    ? "bg-[#FFBC0A] w-7"
-                    : "bg-white/30 hover:bg-white/60 w-2"
+                    ? "bg-[#FAF9F7] w-6"
+                    : "bg-white/30 hover:bg-white/60 w-1.5"
                 }`}
                 aria-label={`Slide ${idx + 1}`}
               />
@@ -157,3 +157,4 @@ export function HeroBanner({
     </section>
   );
 }
+
