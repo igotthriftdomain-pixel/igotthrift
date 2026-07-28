@@ -331,7 +331,7 @@ export function ProductEditorForm({
       return;
     }
     if (file.size > MAX_FILE_SIZE) {
-      toast.error("Image size exceeds the 5MB limit.");
+      toast.error("Image size exceeds the 3MB limit.");
       return;
     }
 
@@ -771,7 +771,7 @@ export function ProductEditorForm({
                     <UploadCloud className="size-6 text-zinc-400" />
                   </div>
                   <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Drag files here or click to select</span>
-                  <p className="text-[10px] text-zinc-400 mt-1">PNG, JPG, JPEG or WEBP (Max 5MB per file)</p>
+                  <p className="text-[10px] text-zinc-400 mt-1">PNG, JPG, JPEG or WEBP (Max 3MB per file)</p>
                 </div>
 
                 {errors.images && <p className="text-red-400 text-xs">{errors.images}</p>}

@@ -15,6 +15,6 @@ export const ALLOWED_BANNER_TYPES = [
   "video/webm",
   "video/quicktime",
 ];
-export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-export const MAX_BANNER_FILE_SIZE = 15 * 1024 * 1024; // 15 MB
+export const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3 MB
+export const MAX_BANNER_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 

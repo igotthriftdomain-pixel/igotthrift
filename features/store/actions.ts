@@ -43,7 +43,7 @@ export async function uploadLogoAction(formData: FormData) {
   }
 
   if (file.size > MAX_FILE_SIZE) {
-    return { success: false, error: "File size exceeds the 5MB limit." };
+    return { success: false, error: "File size exceeds the 3MB limit." };
   }
 
   try {
@@ -69,7 +69,7 @@ export async function uploadBannerAction(formData: FormData, slideIndex: 1 | 2 =
   }
 
   if (file.size > MAX_BANNER_FILE_SIZE) {
-    return { success: false, error: "File size exceeds the 15MB limit." };
+    return { success: false, error: "File size exceeds the 10MB limit." };
   }
 
   try {

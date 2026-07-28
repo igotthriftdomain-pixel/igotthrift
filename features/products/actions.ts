@@ -95,7 +95,7 @@ export async function uploadProductImageAction(productId: string, imageUuid: str
   }
 
   if (file.size > MAX_FILE_SIZE) {
-    return { success: false, error: "File size exceeds the 5MB limit." };
+    return { success: false, error: "File size exceeds the 3MB limit." };
   }
 
   try {

@@ -27,9 +27,7 @@ import {
   UploadCloud,
   Trash2,
   Image as ImageIcon,
-  Globe,
   Sparkles,
-  Eye,
   AlertTriangle,
   Video,
 } from "lucide-react";
@@ -89,10 +87,8 @@ export function StoreSettingsForm({
   const [description, setDescription] = useState(initialStore.description || "");
   const [whatsappNumber, setWhatsappNumber] = useState(initialStore.whatsapp_number);
   const [address, setAddress] = useState(initialStore.address || "");
-  const [themeColor, setThemeColor] = useState(initialStore.theme_color);
   const [currencyCode, setCurrencyCode] = useState(initialStore.currency_code);
   const [currencySymbol, setCurrencySymbol] = useState(initialStore.currency_symbol);
-  const [website, setWebsite] = useState(initialStore.website || "");
   const [instagram, setInstagram] = useState(initialStore.instagram || "");
   const [facebook, setFacebook] = useState(initialStore.facebook || "");
 
@@ -135,10 +131,8 @@ export function StoreSettingsForm({
     description !== (initialStore.description || "") ||
     whatsappNumber !== initialStore.whatsapp_number ||
     address !== (initialStore.address || "") ||
-    themeColor !== initialStore.theme_color ||
     currencyCode !== initialStore.currency_code ||
     currencySymbol !== initialStore.currency_symbol ||
-    website !== (initialStore.website || "") ||
     instagram !== (initialStore.instagram || "") ||
     facebook !== (initialStore.facebook || "");
 
@@ -154,11 +148,6 @@ export function StoreSettingsForm({
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [isDirty]);
 
-  // Sync color picker inputs
-  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setThemeColor(e.target.value);
-  };
-
   // Image File Validations
   const validateImageFile = (file: File): boolean => {
     if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
@@ -166,7 +155,7 @@ export function StoreSettingsForm({
       return false;
     }
     if (file.size > MAX_FILE_SIZE) {
-      toast.error("File is too large. Maximum allowed size is 5MB.");
+      toast.error("File is too large. Maximum allowed size is 3MB.");
       return false;
     }
     return true;
@@ -178,7 +167,7 @@ export function StoreSettingsForm({
       return false;
     }
     if (file.size > MAX_BANNER_FILE_SIZE) {
-      toast.error("File is too large. Maximum allowed size for hero banner is 15MB.");
+      toast.error("File is too large. Maximum allowed size for hero banner is 10MB.");
       return false;
     }
     return true;
@@ -314,10 +303,10 @@ export function StoreSettingsForm({
         description,
         whatsapp_number: whatsappNumber,
         address,
-        theme_color: themeColor,
+        theme_color: initialStore.theme_color || "#0A0A0A",
         currency_code: currencyCode,
         currency_symbol: currencySymbol,
-        website: website || null,
+        website: initialStore.website || null,
         instagram: instagram || null,
         facebook: facebook || null,
         meta_title: initialStore.meta_title || null,
@@ -492,40 +481,6 @@ export function StoreSettingsForm({
             </CardContent>
           </Card>
 
-          {/* Style Customizer */}
-          <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
-            <CardHeader>
-              <CardTitle className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Theme Styling</CardTitle>
-              <CardDescription>Customize the core palette of the storefront catalog</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Field>
-                <FieldLabel className="text-zinc-700 dark:text-zinc-300 font-medium">Primary Accent Color</FieldLabel>
-                <div className="flex gap-3 items-center">
-                  <div className="relative size-10 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800">
-                    <input
-                      type="color"
-                      value={themeColor}
-                      onChange={handleColorChange}
-                      disabled={saving}
-                      className="absolute inset-0 size-full cursor-pointer p-0 border-0"
-                      aria-label="Color Picker"
-                    />
-                  </div>
-                  <Input
-                    type="text"
-                    value={themeColor}
-                    onChange={(e) => setThemeColor(e.target.value)}
-                    disabled={saving}
-                    placeholder="#000000"
-                    className="bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-50 w-36 uppercase font-mono"
-                    aria-label="Color Hex Input"
-                  />
-                </div>
-              </Field>
-            </CardContent>
-          </Card>
-
           {/* Social Links */}
           <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
             <CardHeader>
@@ -534,22 +489,6 @@ export function StoreSettingsForm({
             </CardHeader>
             <CardContent className="space-y-4">
               <FieldGroup className="space-y-4">
-                <Field>
-                  <FieldLabel className="text-zinc-700 dark:text-zinc-300 font-medium flex items-center gap-2">
-                    <Globe className="size-4 text-zinc-400" />
-                    Website Link
-                  </FieldLabel>
-                  <Input
-                    type="text"
-                    value={website}
-                    onChange={(e) => setWebsite(e.target.value)}
-                    disabled={saving}
-                    className="bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-50"
-                    placeholder="https://yourdomain.com"
-                    aria-label="Website Link"
-                  />
-                </Field>
-
                 <div className="grid gap-4 md:grid-cols-2">
                   <Field>
                     <FieldLabel className="text-zinc-700 dark:text-zinc-300 font-medium flex items-center gap-2">
@@ -650,7 +589,7 @@ export function StoreSettingsForm({
                   </div>
                   <div>
                     <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Upload store logo</span>
-                    <p className="text-[10px] text-zinc-400 mt-1">PNG, JPG, JPEG or WEBP (Max 5MB)</p>
+                    <p className="text-[10px] text-zinc-400 mt-1">PNG, JPG, JPEG or WEBP (Max 3MB)</p>
                   </div>
                 </div>
               )}
@@ -756,7 +695,7 @@ export function StoreSettingsForm({
                     <div className="space-y-1.5">
                       <UploadCloud className="size-6 text-zinc-400 mx-auto" />
                       <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Upload Slide 1 (Image or Video)</span>
-                      <p className="text-[10px] text-zinc-400">PNG, JPG, WEBP, MP4, WEBM (Max 15MB)</p>
+                      <p className="text-[10px] text-zinc-400">PNG, JPG, WEBP, MP4, WEBM (Max 10MB)</p>
                     </div>
                   )}
                 </div>
@@ -830,7 +769,7 @@ export function StoreSettingsForm({
                     <div className="space-y-1.5">
                       <UploadCloud className="size-6 text-zinc-400 mx-auto" />
                       <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">Upload Slide 2 (Image or Video)</span>
-                      <p className="text-[10px] text-zinc-400">PNG, JPG, WEBP, MP4, WEBM (Max 15MB)</p>
+                      <p className="text-[10px] text-zinc-400">PNG, JPG, WEBP, MP4, WEBM (Max 10MB)</p>
                     </div>
                   )}
                 </div>
@@ -858,39 +797,6 @@ export function StoreSettingsForm({
                   </div>
                 )}
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Live Theme Preview Card */}
-        <Card className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-              <Eye className="size-4 text-emerald-500" /> Live Theme Accent Preview
-            </CardTitle>
-            <CardDescription>How the theme color will style checkout buttons and details</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-4 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950/40 space-y-3">
-              <span className="text-[11px] text-zinc-400 uppercase tracking-wider block font-semibold">Simulated Button</span>
-              <button
-                type="button"
-                className="w-full h-9 rounded-lg font-semibold text-xs transition-all shadow-xs cursor-default pointer-events-none"
-                style={{
-                  backgroundColor: themeColor,
-                  color: "#ffffff",
-                }}
-              >
-                Order on WhatsApp
-              </button>
-
-              <span className="text-[11px] text-zinc-400 uppercase tracking-wider block font-semibold mt-2">Active Link Accent</span>
-              <span
-                className="text-xs font-semibold cursor-default hover:underline transition-colors block"
-                style={{ color: themeColor }}
-              >
-                View Category Catalog →
-              </span>
             </div>
           </CardContent>
         </Card>

@@ -59,39 +59,24 @@ export function HeroBanner({
                   muted
                   loop
                   playsInline
-                  className="w-full h-full object-cover opacity-50 scale-105"
+                  className="w-full h-full object-cover opacity-85 scale-100"
                 />
               ) : (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={slide.url}
                   alt={`${store.name} Hero Slide ${index + 1}`}
-                  className="w-full h-full object-cover opacity-45 scale-105"
+                  className="w-full h-full object-cover opacity-85 scale-100"
                 />
               )}
             </div>
           );
         })}
-        {/* Layered vignette and dark gradient mask */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/70 to-black/40 z-20" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(10,10,10,0.75)_100%)] z-20" />
+        {/* Subtle gradient overlay to ensure text contrast while keeping uploaded media clear */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/40 to-black/30 z-20" />
       </div>
 
       <div className="relative z-30 max-w-4xl mx-auto text-center space-y-8 flex flex-col items-center">
-        {/* Store Logo */}
-        {store.logoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={store.logoUrl}
-            alt={store.name}
-            className="max-h-20 sm:max-h-24 max-w-[240px] w-auto h-auto object-contain rounded-lg border border-[#FAF9F7]/30 shadow-2xl"
-          />
-        ) : (
-          <div className="size-24 rounded-full bg-[#171717] text-[#FAF9F7] flex items-center justify-center font-semibold text-2xl border-2 border-[#FAF9F7]/30 ring-1 ring-white/10 shadow-2xl uppercase tracking-wider">
-            {store.name.substring(0, 2)}
-          </div>
-        )}
-
         {/* Store Name & Description */}
         <div className="space-y-3 max-w-2xl">
           <h1 className="text-3xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-[#FAF9F7] leading-none break-words max-w-full">

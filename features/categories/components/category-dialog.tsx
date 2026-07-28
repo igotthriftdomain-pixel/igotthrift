@@ -29,7 +29,7 @@ export function CategoryDialog({
   const [name, setName] = useState(category ? category.name : "");
   const [slug, setSlug] = useState(category ? category.slug : "");
   const [description, setDescription] = useState(category ? category.description || "" : "");
-  const [active, setActive] = useState(category ? category.active : true);
+  const [active] = useState(category ? category.active : true);
   const [imagePath, setImagePath] = useState<string | null>(category?.image_path || null);
   const [imagePreview, setImagePreview] = useState<string | null>(category?.imageUrl || null);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -67,7 +67,7 @@ export function CategoryDialog({
       return;
     }
     if (file.size > MAX_FILE_SIZE) {
-      toast.error("Image size exceeds 5MB limit.");
+      toast.error("Image size exceeds 3MB limit.");
       return;
     }
 
@@ -214,7 +214,7 @@ export function CategoryDialog({
             {/* Category Image Upload / Preview Field */}
             <Field>
               <FieldLabel className="text-zinc-700 dark:text-zinc-300 font-medium flex items-center justify-between">
-                <span>Category Image <span className="text-xs text-zinc-400 font-normal">(Optional)</span></span>
+                <span>Category Image <span className="text-xs text-red-500 font-normal">*Required</span></span>
               </FieldLabel>
 
               <input
@@ -271,25 +271,11 @@ export function CategoryDialog({
                   </div>
                   <div className="text-left">
                     <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 block">Click to upload category cover image</span>
-                    <span className="text-[10px] text-zinc-400 block">PNG, JPG, JPEG or WEBP (Max 5MB)</span>
+                    <span className="text-[10px] text-zinc-400 block">PNG, JPG, JPEG or WEBP (Max 3MB)</span>
                   </div>
                 </div>
               )}
-            </Field>
-
-            <Field className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                checked={active}
-                onChange={(e) => setActive(e.target.checked)}
-                disabled={loading}
-                className="rounded border-zinc-300 dark:border-zinc-800 text-zinc-900 focus:ring-zinc-950 size-4 cursor-pointer"
-                id="category-active"
-                aria-label="Active status"
-              />
-              <label htmlFor="category-active" className="text-sm text-zinc-700 dark:text-zinc-300 cursor-pointer font-medium">
-                Make this category active on storefront
-              </label>
+              {errors.image_path && <FieldError className="text-red-400 text-xs mt-1">{errors.image_path}</FieldError>}
             </Field>
           </FieldGroup>
 
