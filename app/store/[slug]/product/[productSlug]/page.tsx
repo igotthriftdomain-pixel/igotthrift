@@ -63,7 +63,7 @@ export default async function ProductDetailsPage({ params }: PageProps) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
+    <div className="max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
       {/* Breadcrumb / Back button */}
       <div>
         <Link
@@ -75,7 +75,7 @@ export default async function ProductDetailsPage({ params }: PageProps) {
       </div>
 
       {/* Product Details Grid */}
-      <div className="grid gap-12 lg:grid-cols-2 items-start">
+      <div className="grid gap-8 lg:grid-cols-2 lg:gap-10 items-start">
         {/* Left: Gallery */}
         <div className="space-y-4">
           <Suspense fallback={<GallerySkeleton />}>

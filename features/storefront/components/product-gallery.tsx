@@ -40,7 +40,7 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
   return (
     <div className="space-y-4">
       {/* Primary Display Frame with 4:5 aspect ratio */}
-      <div className="relative aspect-[4/5] rounded-xl overflow-hidden border border-[#E7E7E5] dark:border-zinc-800 bg-[#F6F6F4] dark:bg-zinc-950 flex items-center justify-center group shadow-xs">
+      <div className="relative aspect-[4/5] max-h-[460px] w-full mx-auto rounded-xl overflow-hidden border border-[#E7E7E5] dark:border-zinc-800 bg-[#F6F6F4] dark:bg-zinc-950 flex items-center justify-center group shadow-xs">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={activeImage.publicUrl}
@@ -75,12 +75,12 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
 
       {/* Thumbnails strip (Only if > 1 image) */}
       {images.length > 1 && (
-        <div className="flex gap-3 overflow-x-auto py-1 no-scrollbar">
+        <div className="flex gap-2.5 overflow-x-auto py-1 no-scrollbar">
           {images.map((img, idx) => (
             <button
               key={img.storagePath}
               onClick={() => setActiveIndex(idx)}
-              className={`relative size-20 shrink-0 rounded-lg overflow-hidden border cursor-pointer transition-all duration-200 ease-out ${
+              className={`relative size-16 shrink-0 rounded-lg overflow-hidden border cursor-pointer transition-all duration-200 ease-out ${
                 idx === activeIndex
                   ? "border-[#0A0A0A] dark:border-white ring-2 ring-[#0A0A0A] dark:ring-white scale-100"
                   : "border-[#E7E7E5] dark:border-zinc-800 opacity-60 hover:opacity-100 scale-95"

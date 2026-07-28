@@ -1,6 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { type StorefrontProduct, type StorefrontDetails } from "../types";
-import { ShoppingBag, ArrowUpRight } from "lucide-react";
+import { ShoppingBag, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 export function ProductCard({
   product,
@@ -9,9 +12,33 @@ export function ProductCard({
   product: StorefrontProduct;
   store: StorefrontDetails;
 }) {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   const isSoldOut = product.stockQuantity <= 0;
   const isLowStock = product.stockQuantity > 0 && product.stockQuantity < 3;
   const hasDiscount = product.compareAtPrice !== null && product.compareAtPrice > product.price;
+
+  // Build complete array of image URLs
+  const imageList =
+    product.images && product.images.length > 0
+      ? product.images.map((img) => img.publicUrl)
+      : product.primaryImageUrl
+      ? [product.primaryImageUrl]
+      : [];
+
+  const activeImageUrl = imageList[currentImageIndex] || product.primaryImageUrl;
+
+  const handlePrevImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === 0 ? imageList.length - 1 : prev - 1));
+  };
+
+  const handleNextImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev === imageList.length - 1 ? 0 : prev + 1));
+  };
 
   return (
     <div className="group flex flex-col bg-[#FFFFFF] dark:bg-zinc-900/90 border border-[#E7E7E5] dark:border-zinc-800 rounded-xl overflow-hidden transition-all duration-200 ease-out hover:border-[#111111] dark:hover:border-zinc-600 hover:shadow-xs relative">
@@ -20,15 +47,50 @@ export function ProductCard({
         href={`/store/${store.slug}/product/${product.slug}`}
         className="relative aspect-[4/5] bg-[#F6F6F4] dark:bg-zinc-950 overflow-hidden flex items-center justify-center border-b border-[#E7E7E5] dark:border-zinc-800 block"
       >
-        {product.primaryImageUrl ? (
+        {activeImageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={product.primaryImageUrl}
+            src={activeImageUrl}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           />
         ) : (
           <ShoppingBag className="size-10 text-[#8A8A8A]" />
+        )}
+
+        {/* Left / Right Navigation Arrows for cycling product images */}
+        {imageList.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={handlePrevImage}
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-[#0A0A0A]/85 hover:bg-[#0A0A0A] text-white size-8 rounded-full flex items-center justify-center z-20 shadow-md cursor-pointer active:scale-95"
+              aria-label="Previous product image"
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+
+            <button
+              type="button"
+              onClick={handleNextImage}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-[#0A0A0A]/85 hover:bg-[#0A0A0A] text-[#FFFFFF] size-8 rounded-full flex items-center justify-center z-20 shadow-md cursor-pointer active:scale-95"
+              aria-label="Next product image"
+            >
+              <ChevronRight className="size-4" />
+            </button>
+
+            {/* Slide Dots Indicator */}
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1 z-20 bg-black/50 px-2 py-0.5 rounded-full backdrop-blur-xs">
+              {imageList.map((_, idx) => (
+                <span
+                  key={idx}
+                  className={`size-1.5 rounded-full transition-all ${
+                    idx === currentImageIndex ? "bg-white w-3" : "bg-white/50"
+                  }`}
+                />
+              ))}
+            </div>
+          </>
         )}
 
         {/* Status badges overlay */}
@@ -52,9 +114,11 @@ export function ProductCard({
         )}
 
         {/* Quick view hover indicator */}
-        <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out bg-[#0A0A0A] text-[#FFFFFF] size-8 rounded-md flex items-center justify-center shadow-xs">
-          <ArrowUpRight className="size-4" />
-        </div>
+        {imageList.length <= 1 && (
+          <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out bg-[#0A0A0A] text-[#FFFFFF] size-8 rounded-md flex items-center justify-center shadow-xs">
+            <ArrowUpRight className="size-4" />
+          </div>
+        )}
       </Link>
 
       {/* Details Container */}
@@ -112,4 +176,3 @@ export function ProductCard({
     </div>
   );
 }
-

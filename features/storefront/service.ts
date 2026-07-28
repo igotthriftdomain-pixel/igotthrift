@@ -212,6 +212,7 @@ export async function getProductsByCategory(
     .select("id")
     .eq("store_id", storeId)
     .eq("slug", categorySlug)
+    .eq("active", true)
     .maybeSingle();
 
   if (!categoryData) return [];
