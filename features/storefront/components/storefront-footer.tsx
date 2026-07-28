@@ -42,7 +42,7 @@ export function StorefrontFooter({ store }: { store: StorefrontDetails }) {
           <div className="flex items-center gap-3">
             {store.logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={store.logoUrl} alt={store.name} className="size-8 rounded-full object-cover border border-[#FAF9F7]" />
+              <img src={store.logoUrl} alt={store.name} className="max-h-8 max-w-[140px] w-auto h-auto object-contain shrink-0" />
             ) : (
               <div className="size-8 rounded-full bg-[#171717] text-[#FAF9F7] flex items-center justify-center font-bold text-xs uppercase border border-[#FAF9F7]/30">
                 {store.name.substring(0, 2)}

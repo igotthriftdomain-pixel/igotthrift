@@ -90,6 +90,7 @@ export const getStoreBySlug = cache(async (slug: string): Promise<StorefrontDeta
   return {
     id: data.id,
     name: data.name,
+    tagline: data.tagline ? data.tagline.trim() || null : null,
     slug: data.slug,
     description: data.description,
     logoUrl,
@@ -125,6 +126,9 @@ export async function getActiveCategories(storeId: string): Promise<StorefrontCa
     name: cat.name,
     slug: cat.slug,
     description: cat.description,
+    imageUrl: cat.image_path
+      ? supabase.storage.from("store-assets").getPublicUrl(cat.image_path).data.publicUrl
+      : null,
     sortOrder: cat.sort_order,
   }));
 }

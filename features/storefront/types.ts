@@ -28,6 +28,7 @@ export interface StorefrontCategory {
   name: string;
   slug: string;
   description: string | null;
+  imageUrl?: string | null;
   sortOrder: number;
 }
 
@@ -39,6 +40,7 @@ export interface HeroBannerSlide {
 export interface StorefrontDetails {
   id: string;
   name: string;
+  tagline?: string | null;
   slug: string;
   description: string | null;
   logoUrl: string | null;

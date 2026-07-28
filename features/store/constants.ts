@@ -1,4 +1,5 @@
 export const CHARACTER_LIMITS = {
+  tagline: 60,
   description: 160,
   metaTitle: 60,
   metaDescription: 160,

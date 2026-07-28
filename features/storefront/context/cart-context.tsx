@@ -21,7 +21,7 @@ interface CartState {
 
 interface CartContextType {
   items: CartItem[];
-  addItem: (product: StorefrontProduct, quantity: number) => void;
+  addItem: (product: StorefrontProduct) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
@@ -84,31 +84,33 @@ export function CartProvider({
     }
   };
 
-  const addItem = (product: StorefrontProduct, quantity: number) => {
+  const addItem = (product: StorefrontProduct) => {
     const existingIndex = cartState.items.findIndex((item) => item.id === product.id);
-    const currentQty = existingIndex > -1 ? cartState.items[existingIndex].quantity : 0;
-    const newQty = currentQty + quantity;
 
-    if (newQty > product.stockQuantity) {
-      toast.error(`Cannot add more items. Only ${product.stockQuantity} left in stock.`);
+    if (existingIndex > -1) {
+      toast.info("This piece is already in your bag");
       return;
     }
 
-    const updatedItems = [...cartState.items];
-    if (existingIndex > -1) {
-      updatedItems[existingIndex].quantity = newQty;
-    } else {
-      updatedItems.push({
+    if (product.stockQuantity <= 0) {
+      toast.error("This piece is sold out");
+      return;
+    }
+
+    const updatedItems = [
+      ...cartState.items,
+      {
         id: product.id,
         name: product.name,
         slug: product.slug,
         price: product.price,
         primaryImageUrl: product.primaryImageUrl,
         stockQuantity: product.stockQuantity,
-        quantity,
-      });
-    }
+        quantity: 1,
+      },
+    ];
 
+    toast.success("Added to bag");
     saveCart(updatedItems);
   };
 

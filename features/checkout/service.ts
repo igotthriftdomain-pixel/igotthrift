@@ -37,11 +37,11 @@ export async function verifyStockAndPrices(
     }
 
     const availableStock = dbProduct.stock ?? 0;
-    if (availableStock < item.quantity) {
-      return { success: false, error: `Product "${item.name}" only has ${availableStock} items left in stock.` };
+    if (availableStock <= 0) {
+      return { success: false, error: `Product "${item.name}" is currently Sold Out and no longer available.` };
     }
 
-    recalculatedSubtotal += dbProduct.price * item.quantity;
+    recalculatedSubtotal += dbProduct.price;
   }
 
   return { success: true, recalculatedSubtotal };
@@ -72,23 +72,6 @@ export async function createOrderRecord(
   if (error || !data) {
     console.error("Order insertion failed:", error);
     return { success: false, error: "Failed to log checkout order. Try again." };
-  }
-
-  // Safely update stocks for each item
-  for (const item of items) {
-    const { data: currentProduct } = await supabase
-      .from("products")
-      .select("stock")
-      .eq("id", item.id)
-      .maybeSingle();
-      
-    if (currentProduct) {
-      const newStock = Math.max(0, currentProduct.stock - item.quantity);
-      await supabase
-        .from("products")
-        .update({ stock: newStock })
-        .eq("id", item.id);
-    }
   }
 
   return { success: true, orderId: data.id };

@@ -3,6 +3,8 @@ import { type StorefrontDetails } from "../types";
 import { CartDrawer } from "./cart-drawer";
 
 export function StorefrontHeader({ store }: { store: StorefrontDetails }) {
+  const trimmedTagline = store.tagline ? store.tagline.trim() : "";
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#E7E7E5] dark:border-zinc-800 bg-[#FAF9F7]/95 dark:bg-[#0A0A0A]/95 backdrop-blur-md transition-colors">
       {/* Top Banner Announcement Strip */}
@@ -20,7 +22,7 @@ export function StorefrontHeader({ store }: { store: StorefrontDetails }) {
             <img
               src={store.logoUrl}
               alt={store.name}
-              className="size-9 rounded-full object-cover border border-[#0A0A0A] dark:border-white transition-transform group-hover:scale-105 shrink-0"
+              className="max-h-9 sm:max-h-10 w-auto max-w-[130px] sm:max-w-[180px] object-contain transition-transform group-hover:scale-[1.02] shrink-0"
             />
           ) : (
             <div className="size-9 rounded-full bg-[#0A0A0A] text-[#FFFFFF] flex items-center justify-center font-bold text-xs border border-[#171717] uppercase tracking-wider shrink-0">
@@ -31,9 +33,11 @@ export function StorefrontHeader({ store }: { store: StorefrontDetails }) {
             <span className="font-bold text-[#111111] dark:text-[#FAF9F7] tracking-tight text-sm sm:text-base leading-tight group-hover:text-[#666666] dark:group-hover:text-zinc-300 transition-colors truncate max-w-[140px] sm:max-w-none">
               {store.name}
             </span>
-            <span className="text-[9px] font-medium text-[#8A8A8A] uppercase tracking-[0.2em] leading-none pt-0.5 truncate">
-              Boutique Store
-            </span>
+            {trimmedTagline && (
+              <span className="text-[9px] font-medium text-[#8A8A8A] uppercase tracking-[0.2em] leading-none pt-0.5 truncate max-w-[140px] sm:max-w-none">
+                {trimmedTagline}
+              </span>
+            )}
           </div>
         </Link>
 

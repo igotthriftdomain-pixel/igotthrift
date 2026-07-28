@@ -38,12 +38,12 @@ export function QuantitySelector({ quantity, max, onChange }: QuantitySelectorPr
       <span className="text-xs font-semibold text-[#111111] dark:text-[#FAF9F7] uppercase tracking-[0.15em]">
         Quantity
       </span>
-      <div className="flex items-center gap-1 w-36 border border-[#E7E7E5] dark:border-zinc-800 rounded-none p-1 bg-[#FFFFFF] dark:bg-zinc-950">
+      <div className="flex items-center gap-1 w-36 border border-[#E7E7E5] dark:border-zinc-800 rounded-md p-1 bg-[#FFFFFF] dark:bg-zinc-950 transition-colors">
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="size-8 text-[#111111] dark:text-white hover:bg-[#F6F6F4] dark:hover:bg-zinc-900 shrink-0 cursor-pointer rounded-none"
+          className="size-8 text-[#111111] dark:text-white hover:bg-[#F6F6F4] dark:hover:bg-zinc-900 shrink-0 cursor-pointer rounded-md transition-all duration-200 ease-out active:scale-95"
           disabled={quantity <= 1}
           onClick={handleMinus}
           aria-label="Decrease quantity"
@@ -65,7 +65,7 @@ export function QuantitySelector({ quantity, max, onChange }: QuantitySelectorPr
           type="button"
           variant="ghost"
           size="icon"
-          className="size-8 text-[#111111] dark:text-white hover:bg-[#F6F6F4] dark:hover:bg-zinc-900 shrink-0 cursor-pointer rounded-none"
+          className="size-8 text-[#111111] dark:text-white hover:bg-[#F6F6F4] dark:hover:bg-zinc-900 shrink-0 cursor-pointer rounded-md transition-all duration-200 ease-out active:scale-95"
           disabled={quantity >= max}
           onClick={handlePlus}
           aria-label="Increase quantity"

@@ -3,6 +3,11 @@ import { CHARACTER_LIMITS } from "./constants";
 
 export const storeSettingsSchema = z.object({
   name: z.string().min(2, "Store name must be at least 2 characters"),
+  tagline: z
+    .string()
+    .max(CHARACTER_LIMITS.tagline, `Tagline cannot exceed ${CHARACTER_LIMITS.tagline} characters`)
+    .nullable()
+    .optional(),
   description: z
     .string()
     .max(CHARACTER_LIMITS.description, `Description cannot exceed ${CHARACTER_LIMITS.description} characters`)

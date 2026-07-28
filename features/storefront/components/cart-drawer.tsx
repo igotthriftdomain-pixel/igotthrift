@@ -12,12 +12,12 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
-import { ShoppingBag, Trash2, Plus, Minus } from "lucide-react";
+import { ShoppingBag, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { CheckoutSheet } from "../../checkout/components/checkout-sheet";
 
 export function CartDrawer({ store }: { store: StorefrontDetails }) {
-  const { items, removeItem, updateQuantity, itemCount, subtotal } = useCart();
+  const { items, removeItem, itemCount, subtotal } = useCart();
   const [open, setOpen] = useState(false);
 
   return (
@@ -62,7 +62,7 @@ export function CartDrawer({ store }: { store: StorefrontDetails }) {
                   Discover fresh vintage fashion items and add them to your order bag.
                 </p>
               </div>
-              <SheetClose className="inline-flex items-center justify-center rounded-none bg-[#0A0A0A] hover:bg-[#171717] text-white text-xs font-semibold uppercase tracking-[0.15em] px-6 h-10 cursor-pointer transition-all active:scale-98">
+              <SheetClose className="inline-flex items-center justify-center rounded-lg bg-[#0A0A0A] hover:bg-[#171717] text-white text-xs font-bold uppercase tracking-[0.15em] px-6 h-11 cursor-pointer transition-all duration-200 ease-out active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A0A0A] shadow-xs">
                 Browse Collection
               </SheetClose>
             </div>
@@ -71,10 +71,10 @@ export function CartDrawer({ store }: { store: StorefrontDetails }) {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="flex gap-4 p-3.5 bg-[#FFFFFF] dark:bg-zinc-900/60 border border-[#E7E7E5] dark:border-zinc-800 items-center relative group"
+                  className="flex gap-4 p-3.5 bg-[#FFFFFF] dark:bg-zinc-900/60 border border-[#E7E7E5] dark:border-zinc-800 rounded-xl items-center relative group transition-colors"
                 >
                   {/* Thumbnail */}
-                  <div className="size-16 rounded-none bg-[#F6F6F4] dark:bg-zinc-950 overflow-hidden shrink-0 border border-[#E7E7E5] dark:border-zinc-800">
+                  <div className="size-16 rounded-lg bg-[#F6F6F4] dark:bg-zinc-950 overflow-hidden shrink-0 border border-[#E7E7E5] dark:border-zinc-800">
                     {item.primaryImageUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={item.primaryImageUrl} alt={item.name} className="w-full h-full object-cover" />
@@ -87,49 +87,25 @@ export function CartDrawer({ store }: { store: StorefrontDetails }) {
                   <div className="flex-1 min-w-0 space-y-1 text-left">
                     <Link
                       href={`/store/${store.slug}/product/${item.slug}`}
-                      className="font-medium text-[#111111] dark:text-[#FAF9F7] text-xs tracking-tight line-clamp-1 hover:text-[#666666] transition-colors"
+                      className="font-medium text-[#111111] dark:text-[#FAF9F7] text-xs tracking-tight line-clamp-1 hover:text-[#666666] transition-colors duration-200"
                       onClick={() => setOpen(false)}
                     >
                       {item.name}
                     </Link>
-                    <p className="text-xs font-bold text-[#111111] dark:text-[#FAF9F7]">
-                      {store.currencySymbol}
-                      {item.price.toLocaleString("en-IN")}
-                    </p>
-
-                    {/* Small Inline quantity controller */}
-                    <div className="flex items-center gap-2 pt-1">
-                      <div className="flex items-center gap-1 border border-[#E7E7E5] dark:border-zinc-800 p-0.5 bg-[#FAF9F7] dark:bg-zinc-950 shrink-0">
-                        <button
-                          type="button"
-                          className="size-6 rounded-none flex items-center justify-center text-[#666666] hover:bg-white dark:hover:bg-zinc-800 cursor-pointer disabled:opacity-30"
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          disabled={item.quantity <= 1}
-                          aria-label="Decrease quantity"
-                        >
-                          <Minus className="size-3" />
-                        </button>
-                        <span className="w-6 text-center text-xs font-bold text-[#111111] dark:text-white font-mono">
-                          {item.quantity}
-                        </span>
-                        <button
-                          type="button"
-                          className="size-6 rounded-none flex items-center justify-center text-[#666666] hover:bg-white dark:hover:bg-zinc-800 cursor-pointer disabled:opacity-30"
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          disabled={item.quantity >= item.stockQuantity}
-                          aria-label="Increase quantity"
-                        >
-                          <Plus className="size-3" />
-                        </button>
-                      </div>
+                    <div className="flex items-center justify-between pt-1">
+                      <p className="text-xs font-bold text-[#111111] dark:text-[#FAF9F7]">
+                        {store.currencySymbol}
+                        {item.price.toLocaleString("en-IN")}
+                      </p>
 
                       <button
                         type="button"
                         onClick={() => removeItem(item.id)}
-                        className="text-[#8A8A8A] hover:text-red-600 p-1 cursor-pointer transition-colors"
+                        className="text-[#8A8A8A] hover:text-red-600 p-1 cursor-pointer transition-colors duration-150 rounded-md flex items-center gap-1 text-[10px]"
                         aria-label="Remove item"
                       >
                         <Trash2 className="size-3.5" />
+                        <span>Remove</span>
                       </button>
                     </div>
                   </div>

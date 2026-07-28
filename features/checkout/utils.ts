@@ -10,9 +10,9 @@ export function formatWhatsAppMessage(
   const itemList = items
     .map(
       (item, idx) =>
-        `${idx + 1}. ${item.name}\n   Qty: ${item.quantity}\n   Price: ${currencySymbol}${item.price.toLocaleString("en-IN")}`
+        `${idx + 1}. ${item.name} - ${currencySymbol}${item.price.toLocaleString("en-IN")}`
     )
-    .join("\n\n");
+    .join("\n");
 
   const message = `Hello,
 

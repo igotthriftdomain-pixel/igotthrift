@@ -10,7 +10,10 @@ import {
   deleteCategory,
   toggleCategoryStatus,
   reorderCategories,
+  uploadCategoryImage,
+  removeCategoryImage,
 } from "./service";
+import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from "./constants";
 
 export async function createCategoryAction(data: CategoryInput) {
   const user = await getCurrentUser();
@@ -115,6 +118,50 @@ export async function updateCategoriesOrderAction(orderedIds: string[]) {
     return { success: true };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to reorder categories";
+    return { success: false, error: message };
+  }
+}
+
+export async function uploadCategoryImageAction(categoryId: string, formData: FormData) {
+  const user = await getCurrentUser();
+  if (!user) return { success: false, error: "Unauthorized" };
+
+  const store = await getStoreByOwner(user.id);
+  if (!store) return { success: false, error: "Store not found" };
+
+  const file = formData.get("file") as File;
+  if (!file) return { success: false, error: "No file provided" };
+
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    return { success: false, error: "Invalid file type. PNG, JPG, JPEG, and WEBP allowed." };
+  }
+
+  if (file.size > MAX_FILE_SIZE) {
+    return { success: false, error: "File size exceeds the 5MB limit." };
+  }
+
+  try {
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const result = await uploadCategoryImage(store.id, categoryId, fileBuffer, file.type);
+    return { success: true, ...result };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to upload category image";
+    return { success: false, error: message };
+  }
+}
+
+export async function removeCategoryImageAction(storagePath: string) {
+  const user = await getCurrentUser();
+  if (!user) return { success: false, error: "Unauthorized" };
+
+  const store = await getStoreByOwner(user.id);
+  if (!store) return { success: false, error: "Store not found" };
+
+  try {
+    await removeCategoryImage(store.id, storagePath);
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to remove category image";
     return { success: false, error: message };
   }
 }

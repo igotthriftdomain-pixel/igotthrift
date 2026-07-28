@@ -73,6 +73,7 @@ export async function updateStoreSettings(userId: string, data: StoreSettingsInp
     .from("stores")
     .update({
       name: data.name,
+      tagline: data.tagline ? data.tagline.trim() || null : null,
       description: data.description,
       whatsapp_number: data.whatsapp_number,
       address: data.address,

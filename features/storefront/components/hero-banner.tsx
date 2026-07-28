@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { type StorefrontDetails, type HeroBannerSlide } from "../types";
 import { MOCK_BANNER_URL } from "../constants";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export function HeroBanner({
   store,
@@ -78,19 +78,13 @@ export function HeroBanner({
       </div>
 
       <div className="relative z-30 max-w-4xl mx-auto text-center space-y-8 flex flex-col items-center">
-        {/* Editorial Pill Chip */}
-        <div className="inline-flex items-center gap-2 bg-[#FAF9F7]/10 border border-[#FAF9F7]/25 text-[#FAF9F7] px-4 py-1.5 rounded-full text-[10px] font-medium uppercase tracking-[0.25em] backdrop-blur-md">
-          <span className="inline-block size-1.5 rounded-full bg-[#FAF9F7]" />
-          <span>Curated Drop Collection</span>
-        </div>
-
         {/* Store Logo */}
         {store.logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={store.logoUrl}
             alt={store.name}
-            className="size-24 rounded-full object-cover border-2 border-[#FAF9F7]/30 ring-1 ring-white/10 shadow-2xl"
+            className="max-h-20 sm:max-h-24 max-w-[240px] w-auto h-auto object-contain rounded-lg border border-[#FAF9F7]/30 shadow-2xl"
           />
         ) : (
           <div className="size-24 rounded-full bg-[#171717] text-[#FAF9F7] flex items-center justify-center font-semibold text-2xl border-2 border-[#FAF9F7]/30 ring-1 ring-white/10 shadow-2xl uppercase tracking-wider">
@@ -112,7 +106,7 @@ export function HeroBanner({
         <div className="pt-2 flex flex-col sm:flex-row gap-4 items-center">
           <a
             href="#products-catalog"
-            className="inline-flex items-center justify-center rounded-none bg-[#FFFFFF] hover:bg-[#FAF9F7] text-[#0A0A0A] text-xs font-bold uppercase tracking-[0.2em] px-6 sm:px-9 h-12 transition-all shadow-md active:scale-98 gap-2 border border-[#FFFFFF] max-w-full"
+            className="inline-flex items-center justify-center rounded-lg bg-[#FFFFFF] hover:bg-[#FAF9F7] text-[#0A0A0A] text-xs font-bold uppercase tracking-[0.2em] px-6 sm:px-9 h-12 transition-all duration-200 ease-out active:scale-[0.98] motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white gap-2 border border-[#FFFFFF] max-w-full shadow-sm"
           >
             <span>Explore Collection</span>
             <ArrowRight className="size-4" />
@@ -121,16 +115,10 @@ export function HeroBanner({
 
         {/* Statistics section */}
         {totalProducts !== undefined && totalProducts > 0 && (
-          <div className="pt-6 flex justify-center gap-12 border-t border-white/15 w-full max-w-md mt-4">
+          <div className="pt-6 flex justify-center border-t border-white/15 w-full max-w-xs mt-4">
             <div className="text-center">
               <span className="block text-2xl font-bold text-[#FAF9F7] tracking-tight">{totalProducts}</span>
               <span className="text-[10px] text-[#8A8A8A] font-medium uppercase tracking-[0.2em]">Available Items</span>
-            </div>
-            <div className="text-center">
-              <span className="block text-2xl font-bold text-[#FAF9F7] tracking-tight flex items-center justify-center gap-1.5">
-                100% <ShieldCheck className="size-4 text-[#FAF9F7]" />
-              </span>
-              <span className="text-[10px] text-[#8A8A8A] font-medium uppercase tracking-[0.2em]">Hand-Curated</span>
             </div>
           </div>
         )}

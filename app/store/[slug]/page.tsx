@@ -113,6 +113,9 @@ async function CatalogSectionWrapper({
       : getProductsByCategory(storeId, activeCategory),
   ]);
 
+  const selectedCategory = categories.find((c) => c.slug === activeCategory);
+  const categoryTitle = selectedCategory ? selectedCategory.name : "Collection";
+
   return (
     <div className="space-y-12">
       {/* Categories Horizontal Tabs Selector */}
@@ -139,7 +142,7 @@ async function CatalogSectionWrapper({
           <ProductGrid
             products={catalogProducts}
             store={store}
-            title={activeCategory === "all" ? "All Drop Arrivals" : "Curated Collection"}
+            title={activeCategory === "all" ? "All Drop Arrivals" : categoryTitle}
           />
         </Suspense>
       </div>

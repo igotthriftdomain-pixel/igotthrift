@@ -89,12 +89,12 @@ export default async function ProductDetailsPage({ params }: PageProps) {
             {/* Badges overlay */}
             <div className="flex flex-wrap gap-2">
               {product.featured && (
-                <span className="bg-[#0A0A0A] text-[#FFFFFF] text-[9px] py-1 px-2.5 font-semibold uppercase tracking-[0.2em] shadow-none">
+                <span className="bg-[#0A0A0A] text-[#FFFFFF] text-[9px] py-1 px-2.5 font-bold uppercase tracking-[0.2em] rounded-md shadow-xs">
                   Featured Drop
                 </span>
               )}
               {product.publishedAt && new Date(product.publishedAt) > new Date() && (
-                <span className="bg-[#171717] text-[#FAF9F7] text-[9px] py-1 px-2.5 font-semibold uppercase tracking-[0.2em] flex items-center gap-1.5">
+                <span className="bg-[#171717] text-[#FAF9F7] text-[9px] py-1 px-2.5 font-bold uppercase tracking-[0.2em] flex items-center gap-1.5 rounded-md shadow-xs">
                   <Calendar className="size-3" /> Scheduled
                 </span>
               )}
@@ -105,7 +105,7 @@ export default async function ProductDetailsPage({ params }: PageProps) {
               {product.categoryName && product.categorySlug && (
                 <Link
                   href={`/store/${store.slug}?category=${product.categorySlug}#products-catalog`}
-                  className="text-xs font-semibold text-[#8A8A8A] uppercase tracking-[0.2em] hover:text-[#111111] block transition-colors"
+                  className="text-xs font-semibold text-[#8A8A8A] uppercase tracking-[0.2em] hover:text-[#111111] block transition-colors duration-200"
                 >
                   {product.categoryName}
                 </Link>
@@ -129,7 +129,7 @@ export default async function ProductDetailsPage({ params }: PageProps) {
                     {store.currencySymbol}
                     {product.compareAtPrice.toLocaleString("en-IN")}
                   </span>
-                  <span className="bg-[#0A0A0A] text-white text-[9px] font-semibold uppercase tracking-[0.15em] py-1 px-2.5">
+                  <span className="bg-[#0A0A0A] text-white text-[9px] font-bold uppercase tracking-[0.15em] py-1 px-2.5 rounded-md shadow-xs">
                     Save {Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}%
                   </span>
                 </>
@@ -162,7 +162,7 @@ export default async function ProductDetailsPage({ params }: PageProps) {
           )}
 
           {/* Key Value Trust Chips */}
-          <div className="grid grid-cols-2 gap-3 py-3 border-y border-[#E7E7E5] dark:border-zinc-800 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 py-3 border-y border-[#E7E7E5] dark:border-zinc-800 text-xs">
             <div className="flex items-center gap-2 text-[#666666] dark:text-zinc-300 font-medium">
               <ShieldCheck className="size-4 text-[#111111] dark:text-white" />
               <span>100% Authentic Quality</span>
@@ -173,8 +173,8 @@ export default async function ProductDetailsPage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Purchase details (Quantity selector & Cart CTA) */}
-          <ProductPurchaseControls product={product} />
+          {/* Purchase details (Buy Now & Add to Bag CTAs) */}
+          <ProductPurchaseControls product={product} store={store} />
         </div>
       </div>
 

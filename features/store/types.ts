@@ -2,6 +2,7 @@ export interface Store {
   id: string;
   owner_id: string;
   name: string;
+  tagline: string | null;
   slug: string;
   description: string | null;
   logo_url: string | null;

@@ -4,6 +4,8 @@ export interface Category {
   name: string;
   slug: string;
   description: string | null;
+  image_path?: string | null;
+  imageUrl?: string | null;
   sort_order: number;
   active: boolean;
   created_at: string;

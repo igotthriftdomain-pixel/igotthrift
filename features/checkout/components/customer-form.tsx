@@ -32,7 +32,7 @@ export function CustomerForm({ details, errors, onChange, disabled }: CustomerFo
           onChange={(e) => onChange("name", e.target.value)}
           placeholder="e.g. Alex Sharma"
           disabled={disabled}
-          className="h-10 bg-[#FFFFFF] dark:bg-zinc-900 border-[#E7E7E5] dark:border-zinc-800 text-[#111111] dark:text-[#FAF9F7] text-sm focus:border-[#0A0A0A] rounded-none"
+          className="h-10 bg-[#FFFFFF] dark:bg-zinc-900 border-[#E7E7E5] dark:border-zinc-800 text-[#111111] dark:text-[#FAF9F7] text-sm focus:border-[#0A0A0A] rounded-lg transition-all duration-200 ease-out focus-visible:ring-2 focus-visible:ring-[#0A0A0A]"
         />
         {errors.name && (
           <p className="text-xs text-red-600 font-medium" role="alert">
@@ -52,7 +52,7 @@ export function CustomerForm({ details, errors, onChange, disabled }: CustomerFo
           onChange={(e) => onChange("phone", e.target.value)}
           placeholder="e.g. 9876543210"
           disabled={disabled}
-          className="h-10 bg-[#FFFFFF] dark:bg-[#FAF9F7] border-[#E7E7E5] dark:border-zinc-800 text-[#111111] dark:text-[#FAF9F7] text-sm focus:border-[#0A0A0A] rounded-none"
+          className="h-10 bg-[#FFFFFF] dark:bg-zinc-900 border-[#E7E7E5] dark:border-zinc-800 text-[#111111] dark:text-[#FAF9F7] text-sm focus:border-[#0A0A0A] rounded-lg transition-all duration-200 ease-out focus-visible:ring-2 focus-visible:ring-[#0A0A0A]"
         />
         {errors.phone && (
           <p className="text-xs text-red-600 font-medium" role="alert">
@@ -72,7 +72,7 @@ export function CustomerForm({ details, errors, onChange, disabled }: CustomerFo
           placeholder="Enter complete house no., street name, landmark, pin code..."
           disabled={disabled}
           rows={3}
-          className="bg-[#FFFFFF] dark:bg-zinc-900 border-[#E7E7E5] dark:border-zinc-800 text-[#111111] dark:text-[#FAF9F7] text-sm focus:border-[#0A0A0A] rounded-none"
+          className="bg-[#FFFFFF] dark:bg-zinc-900 border-[#E7E7E5] dark:border-zinc-800 text-[#111111] dark:text-[#FAF9F7] text-sm focus:border-[#0A0A0A] rounded-lg transition-all duration-200 ease-out focus-visible:ring-2 focus-visible:ring-[#0A0A0A]"
         />
         {errors.address && (
           <p className="text-xs text-red-600 font-medium" role="alert">

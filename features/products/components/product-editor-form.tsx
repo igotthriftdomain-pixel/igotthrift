@@ -94,18 +94,18 @@ export function ProductEditorForm({
     initialProduct?.compare_at_price ? initialProduct.compare_at_price.toString() : ""
   );
 
-  // Inventory Fields
+  // Inventory & Availability Fields
   const [sku, setSku] = useState(initialProduct?.sku || "");
-  const [stockQuantity, setStockQuantity] = useState(
-    initialProduct?.stock !== undefined ? initialProduct.stock.toString() : (initialProduct?.stock_quantity ? initialProduct.stock_quantity.toString() : "0")
+  const [inStock, setInStock] = useState<boolean>(
+    initialProduct ? ((initialProduct.stock ?? 0) > 0 && Boolean(initialProduct.active)) : true
   );
 
   // Organization Fields
   const [categoryId, setCategoryId] = useState(initialProduct?.category_id || "");
 
   // Visibility Fields
-  const [featured, setFeatured] = useState(initialProduct?.featured || false);
-  const [active, setActive] = useState(initialProduct?.active ?? true);
+  const [featured, setFeatured] = useState<boolean>(Boolean(initialProduct?.featured ?? false));
+  const [active, setActive] = useState<boolean>(Boolean(initialProduct?.active ?? true));
   const [publishedAt, setPublishedAt] = useState(
     initialProduct?.published_at
       ? new Date(initialProduct.published_at).toISOString().slice(0, 16)
@@ -115,11 +115,11 @@ export function ProductEditorForm({
   // Images state
   const [images, setImages] = useState<UploadedImageState[]>(() => {
     if (initialProduct?.product_images) {
-      return initialProduct.product_images.map((img) => ({
+      return initialProduct.product_images.map((img, idx) => ({
         storage_path: img.storage_path,
         publicUrl: img.publicUrl || "",
-        display_order: img.display_order,
-        is_primary: img.is_primary,
+        display_order: img.display_order ?? idx,
+        is_primary: Boolean(img.is_primary ?? idx === 0),
       }));
     }
     return [];
@@ -138,6 +138,8 @@ export function ProductEditorForm({
       ? new Date(initialProduct.published_at).toISOString().slice(0, 16)
       : new Date().toISOString().slice(0, 16);
 
+    const initInStock = initialProduct ? ((initialProduct.stock ?? 0) > 0 && Boolean(initialProduct.active)) : true;
+
     return {
       name: initialProduct?.name || "",
       slug: initialProduct?.slug || "",
@@ -145,16 +147,16 @@ export function ProductEditorForm({
       price: initialProduct?.price ? initialProduct.price.toString() : "",
       compareAtPrice: initialProduct?.compare_at_price ? initialProduct.compare_at_price.toString() : "",
       sku: initialProduct?.sku || "",
-      stockQuantity: initialProduct?.stock !== undefined ? initialProduct.stock.toString() : (initialProduct?.stock_quantity ? initialProduct.stock_quantity.toString() : "0"),
+      inStock: initInStock,
       categoryId: initialProduct?.category_id || "",
-      featured: initialProduct?.featured || false,
-      active: initialProduct?.active ?? true,
+      featured: Boolean(initialProduct?.featured ?? false),
+      active: Boolean(initialProduct?.active ?? true),
       publishedAt: pubDate,
       images: initialProduct?.product_images
-        ? initialProduct.product_images.map((img) => ({
+        ? initialProduct.product_images.map((img, idx) => ({
             storage_path: img.storage_path,
-            display_order: img.display_order,
-            is_primary: img.is_primary,
+            display_order: img.display_order ?? idx,
+            is_primary: Boolean(img.is_primary ?? idx === 0),
           }))
         : [],
     };
@@ -172,7 +174,7 @@ export function ProductEditorForm({
     price !== baseline.price ||
     compareAtPrice !== baseline.compareAtPrice ||
     sku !== baseline.sku ||
-    stockQuantity !== baseline.stockQuantity ||
+    inStock !== baseline.inStock ||
     categoryId !== baseline.categoryId ||
     featured !== baseline.featured ||
     active !== baseline.active ||
@@ -279,7 +281,7 @@ export function ProductEditorForm({
       price,
       compareAtPrice,
       sku,
-      stockQuantity,
+      inStock,
       categoryId,
       featured,
       active,
@@ -287,7 +289,7 @@ export function ProductEditorForm({
       images: images.map((img) => ({
         storage_path: img.storage_path,
         display_order: img.display_order,
-        is_primary: img.is_primary,
+        is_primary: Boolean(img.is_primary),
       })),
     });
 
@@ -452,7 +454,7 @@ export function ProductEditorForm({
 
     const formattedPrice = Number(price);
     const formattedComparePrice = compareAtPrice ? Number(compareAtPrice) : null;
-    const formattedStock = Number(stockQuantity);
+    const formattedStock = inStock ? 1 : 0;
 
     const validation = productSchema.safeParse({
       name,
@@ -465,20 +467,28 @@ export function ProductEditorForm({
       stock: formattedStock,
       category_id: categoryId,
       featured,
-      active,
+      active: inStock,
       published_at: publishedAt ? new Date(publishedAt).toISOString() : null,
       images: images.map((img) => ({
         storage_path: img.storage_path,
         display_order: img.display_order,
-        is_primary: img.is_primary,
+        is_primary: Boolean(img.is_primary),
       })),
     });
 
     if (!validation.success) {
       const fieldErrors: { [key: string]: string } = {};
       validation.error.issues.forEach((issue) => {
-        const path = issue.path[0] as string;
-        fieldErrors[path] = issue.message;
+        const fieldPath = issue.path[0] as string;
+        if (fieldPath === "images") {
+          if (issue.path.length === 1) {
+            fieldErrors["images"] = issue.message;
+          } else {
+            fieldErrors["images"] = `Image #${(issue.path[1] as number) + 1}: ${issue.message}`;
+          }
+        } else {
+          fieldErrors[fieldPath] = issue.message;
+        }
       });
       setErrors(fieldErrors);
       setSaving(false);
@@ -498,15 +508,15 @@ export function ProductEditorForm({
           price,
           compareAtPrice,
           sku,
-          stockQuantity,
+          inStock,
           categoryId,
           featured,
-          active,
+          active: inStock,
           publishedAt,
           images: images.map((img) => ({
             storage_path: img.storage_path,
             display_order: img.display_order,
-            is_primary: img.is_primary,
+            is_primary: Boolean(img.is_primary),
           })),
         });
         toast.success(`Product ${isEditing ? "updated" : "created"} successfully`);
@@ -705,17 +715,26 @@ export function ProductEditorForm({
                     </Field>
 
                     <Field>
-                      <FieldLabel className="text-zinc-700 dark:text-zinc-300 font-medium">Stock Quantity</FieldLabel>
-                      <Input
-                        type="number"
-                        value={stockQuantity}
-                        onChange={(e) => setStockQuantity(e.target.value)}
-                        disabled={saving}
-                        className="bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-50"
-                        placeholder="5"
-                        aria-label="Stock Quantity"
-                      />
-                      {errors.stock && <FieldError className="text-red-400 text-xs mt-1">{errors.stock}</FieldError>}
+                      <FieldLabel className="text-zinc-700 dark:text-zinc-300 font-medium">Availability Status</FieldLabel>
+                      <div className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 mt-1">
+                        <div className="space-y-0.5">
+                          <span className={`text-xs font-bold uppercase tracking-wider block ${inStock ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
+                            {inStock ? "In Stock" : "Sold Out"}
+                          </span>
+                          <p className="text-[10px] text-zinc-500">
+                            {inStock ? "Available for customer purchase" : "Marked as Sold Out on storefront"}
+                          </p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={inStock}
+                          onChange={(e) => setInStock(e.target.checked)}
+                          disabled={saving}
+                          className="size-5 rounded border-zinc-300 dark:border-zinc-700 text-zinc-900 focus:ring-zinc-900 cursor-pointer"
+                          id="product-instock-toggle"
+                          aria-label="In Stock Status"
+                        />
+                      </div>
                     </Field>
                   </FieldGroup>
                 </CardContent>

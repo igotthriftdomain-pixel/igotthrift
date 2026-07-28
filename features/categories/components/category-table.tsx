@@ -108,7 +108,19 @@ export function CategoryTable({ categories }: CategoryTableProps) {
                   </Button>
                 </div>
               </TableCell>
-              <TableCell className="font-medium text-zinc-900 dark:text-zinc-50 py-3">{category.name}</TableCell>
+              <TableCell className="font-medium text-zinc-900 dark:text-zinc-50 py-3">
+                <div className="flex items-center gap-2.5">
+                  {category.imageUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={category.imageUrl}
+                      alt={category.name}
+                      className="size-7 rounded-md object-cover border border-zinc-200 dark:border-zinc-800 shrink-0"
+                    />
+                  )}
+                  <span>{category.name}</span>
+                </div>
+              </TableCell>
               <TableCell className="font-mono text-xs text-zinc-500 py-3">/{category.slug}</TableCell>
               <TableCell className="text-zinc-500 max-w-[200px] truncate py-3" title={category.description || ""}>
                 {category.description || "—"}

@@ -85,6 +85,7 @@ export function StoreSettingsForm({
 
   // Core Store Fields State
   const [name, setName] = useState(initialStore.name);
+  const [tagline, setTagline] = useState(initialStore.tagline || "");
   const [description, setDescription] = useState(initialStore.description || "");
   const [whatsappNumber, setWhatsappNumber] = useState(initialStore.whatsapp_number);
   const [address, setAddress] = useState(initialStore.address || "");
@@ -130,6 +131,7 @@ export function StoreSettingsForm({
   // Derived unsaved changes dirty state detection
   const isDirty =
     name !== initialStore.name ||
+    tagline !== (initialStore.tagline || "") ||
     description !== (initialStore.description || "") ||
     whatsappNumber !== initialStore.whatsapp_number ||
     address !== (initialStore.address || "") ||
@@ -308,6 +310,7 @@ export function StoreSettingsForm({
     try {
       const res = await updateStoreSettingsAction({
         name,
+        tagline: tagline || null,
         description,
         whatsapp_number: whatsappNumber,
         address,
@@ -336,6 +339,7 @@ export function StoreSettingsForm({
   };
 
   // Character counters limits check
+  const taglineCharsLeft = CHARACTER_LIMITS.tagline - tagline.length;
   const descCharsLeft = CHARACTER_LIMITS.description - description.length;
 
   return (
@@ -370,6 +374,31 @@ export function StoreSettingsForm({
                     />
                   </Field>
 
+                  <Field>
+                    <FieldLabel className="text-zinc-700 dark:text-zinc-300 font-medium flex justify-between items-center">
+                      <span>Store Tagline <span className="text-xs text-zinc-400 font-normal">(Optional)</span></span>
+                      <span
+                        className={`text-xs ${
+                          taglineCharsLeft < 10 ? "text-amber-500 font-semibold" : "text-zinc-400"
+                        }`}
+                      >
+                        {taglineCharsLeft} characters remaining
+                      </span>
+                    </FieldLabel>
+                    <Input
+                      type="text"
+                      value={tagline}
+                      onChange={(e) => setTagline(e.target.value)}
+                      disabled={saving}
+                      className="bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-50"
+                      placeholder="e.g. Curated Vintage & Streetwear"
+                      aria-label="Store Tagline"
+                    />
+                    {errors.tagline && <p className="text-red-400 text-xs mt-1">{errors.tagline}</p>}
+                  </Field>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-1">
                   <Field>
                     <FieldLabel className="text-zinc-700 dark:text-zinc-300 font-medium flex items-center gap-1.5">
                       Store Slug <span className="text-xs text-zinc-400 font-normal">(Read-only)</span>
@@ -608,9 +637,9 @@ export function StoreSettingsForm({
             >
               {logoPreview ? (
                 <div className="space-y-4 flex flex-col items-center">
-                  <div className="size-20 rounded-full border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900 flex items-center justify-center p-2">
+                  <div className="h-16 w-auto max-w-[200px] rounded-lg border border-zinc-200 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900 flex items-center justify-center p-2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={logoPreview} alt="Store logo preview" className="max-h-full object-contain" />
+                    <img src={logoPreview} alt="Store logo preview" className="max-h-full max-w-full w-auto h-auto object-contain" />
                   </div>
                   <span className="text-xs text-zinc-500">Drag a file here or click to replace</span>
                 </div>

@@ -22,10 +22,10 @@ export function CategoryList({
 
           <Link
             href={`/store/${storeSlug}?category=all#products-catalog`}
-            className={`shrink-0 px-4 py-2 rounded-none text-xs font-semibold uppercase tracking-[0.15em] transition-all cursor-pointer border ${
+            className={`shrink-0 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-[0.15em] transition-all duration-200 ease-out active:scale-95 cursor-pointer border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A0A0A] ${
               activeCategory === "all"
-                ? "bg-[#0A0A0A] text-[#FFFFFF] border-[#0A0A0A] dark:bg-white dark:text-[#0A0A0A] dark:border-white"
-                : "bg-[#FFFFFF] dark:bg-zinc-900 text-[#666666] dark:text-zinc-300 hover:text-[#111111] dark:hover:text-white border-[#E7E7E5] dark:border-zinc-800 hover:border-[#D4D4D2]"
+                ? "bg-[#0A0A0A] text-[#FFFFFF] border-[#0A0A0A] dark:bg-white dark:text-[#0A0A0A] dark:border-white shadow-xs"
+                : "bg-[#FFFFFF] dark:bg-zinc-900 text-[#666666] dark:text-zinc-300 hover:text-[#111111] dark:hover:text-white border-[#E7E7E5] dark:border-zinc-800 hover:border-[#111111]"
             }`}
           >
             All Products
@@ -34,13 +34,21 @@ export function CategoryList({
             <Link
               key={cat.id}
               href={`/store/${storeSlug}?category=${cat.slug}#products-catalog`}
-              className={`shrink-0 px-4 py-2 rounded-none text-xs font-semibold uppercase tracking-[0.15em] transition-all cursor-pointer border ${
+              className={`shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-[0.15em] transition-all duration-200 ease-out active:scale-95 cursor-pointer border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A0A0A] ${
                 activeCategory === cat.slug
-                  ? "bg-[#0A0A0A] text-[#FFFFFF] border-[#0A0A0A] dark:bg-white dark:text-[#0A0A0A] dark:border-white"
-                  : "bg-[#FFFFFF] dark:bg-zinc-900 text-[#666666] dark:text-zinc-300 hover:text-[#111111] dark:hover:text-white border-[#E7E7E5] dark:border-zinc-800 hover:border-[#D4D4D2]"
+                  ? "bg-[#0A0A0A] text-[#FFFFFF] border-[#0A0A0A] dark:bg-white dark:text-[#0A0A0A] dark:border-white shadow-xs"
+                  : "bg-[#FFFFFF] dark:bg-zinc-900 text-[#666666] dark:text-zinc-300 hover:text-[#111111] dark:hover:text-white border-[#E7E7E5] dark:border-zinc-800 hover:border-[#111111]"
               }`}
             >
-              {cat.name}
+              {cat.imageUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={cat.imageUrl}
+                  alt={cat.name}
+                  className="size-4 rounded-full object-cover shrink-0 border border-current opacity-90"
+                />
+              )}
+              <span>{cat.name}</span>
             </Link>
           ))}
         </div>

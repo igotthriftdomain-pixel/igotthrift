@@ -9,6 +9,7 @@ export const categorySchema = z.object({
     .max(CHARACTER_LIMITS.description, `Description cannot exceed ${CHARACTER_LIMITS.description} characters`)
     .nullable()
     .optional(),
+  image_path: z.string().nullable().optional(),
   active: z.boolean().default(true),
 });
 

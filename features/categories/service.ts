@@ -62,8 +62,15 @@ export async function getCategories(
   const { data, count, error } = await query;
   if (error) throw new Error(error.message);
 
+  const categories = ((data as Category[]) || []).map((cat) => ({
+    ...cat,
+    imageUrl: cat.image_path
+      ? supabase.storage.from("store-assets").getPublicUrl(cat.image_path).data.publicUrl
+      : null,
+  }));
+
   return {
-    categories: (data as Category[]) || [],
+    categories,
     totalCount: count || 0,
   };
 }
@@ -96,6 +103,7 @@ export async function createCategory(storeId: string, data: CategoryInput) {
       name: data.name.trim(),
       slug: normalizedSlug,
       description: data.description ? data.description.trim() : null,
+      image_path: data.image_path || null,
       active: data.active,
       sort_order: nextSortOrder,
     })
@@ -126,6 +134,7 @@ export async function updateCategory(
       name: data.name.trim(),
       slug: normalizedSlug,
       description: data.description ? data.description.trim() : null,
+      image_path: data.image_path || null,
       active: data.active,
     })
     .eq("id", categoryId)
@@ -178,5 +187,40 @@ export async function reorderCategories(storeId: string, orderedIds: string[]) {
     category_ids: orderedIds,
   });
 
+  if (error) throw new Error(error.message);
+}
+
+export async function uploadCategoryImage(
+  storeId: string,
+  categoryId: string,
+  fileBuffer: Buffer,
+  contentType: string
+) {
+  const supabase = await createClient();
+  const imageUuid = typeof crypto.randomUUID === "function" ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
+  const storagePath = `stores/${storeId}/categories/${categoryId}_${imageUuid}.webp`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("store-assets")
+    .upload(storagePath, fileBuffer, {
+      contentType,
+      upsert: true,
+    });
+
+  if (uploadError) throw new Error(uploadError.message);
+
+  const publicUrl = supabase.storage.from("store-assets").getPublicUrl(storagePath).data.publicUrl;
+
+  return { storagePath, publicUrl };
+}
+
+export async function removeCategoryImage(storeId: string, storagePath: string) {
+  const supabase = await createClient();
+
+  if (!storagePath.startsWith(`stores/${storeId}/`)) {
+    throw new Error("Unauthorized storage path");
+  }
+
+  const { error } = await supabase.storage.from("store-assets").remove([storagePath]);
   if (error) throw new Error(error.message);
 }

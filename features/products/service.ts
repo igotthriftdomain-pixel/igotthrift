@@ -189,6 +189,7 @@ export async function createProduct(storeId: string, productId: string, data: Pr
       product_id: productId,
       storage_path: img.storage_path,
       display_order: img.display_order,
+      is_primary: Boolean(img.is_primary),
     }));
 
     const { error: imagesError } = await supabase.from("product_images").insert(imagesToInsert);
@@ -234,6 +235,7 @@ export async function updateProduct(storeId: string, productId: string, data: Pr
       product_id: productId,
       storage_path: img.storage_path,
       display_order: img.display_order,
+      is_primary: Boolean(img.is_primary),
     }));
 
     const { error: imagesError } = await supabase.from("product_images").insert(imagesToInsert);

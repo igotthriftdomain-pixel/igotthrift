@@ -1,14 +1,19 @@
-"use client";
-
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { type Category } from "../types";
 import { categorySchema } from "../schema";
-import { createCategoryAction, updateCategoryAction } from "../actions";
+import {
+  createCategoryAction,
+  updateCategoryAction,
+  uploadCategoryImageAction,
+  removeCategoryImageAction,
+} from "../actions";
+import { ALLOWED_IMAGE_TYPES, MAX_FILE_SIZE } from "../constants";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Field, FieldLabel, FieldError, FieldGroup } from "@/components/ui/field";
+import { UploadCloud, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export function CategoryDialog({
@@ -25,9 +30,13 @@ export function CategoryDialog({
   const [slug, setSlug] = useState(category ? category.slug : "");
   const [description, setDescription] = useState(category ? category.description || "" : "");
   const [active, setActive] = useState(category ? category.active : true);
+  const [imagePath, setImagePath] = useState<string | null>(category?.image_path || null);
+  const [imagePreview, setImagePreview] = useState<string | null>(category?.imageUrl || null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSlugEdited, setIsSlugEdited] = useState(!!category);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-slugify name
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,6 +58,56 @@ export function CategoryDialog({
     setIsSlugEdited(true);
   };
 
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      toast.error("Invalid image format. PNG, JPG, JPEG, and WEBP allowed.");
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("Image size exceeds 5MB limit.");
+      return;
+    }
+
+    setUploadingImage(true);
+    const categoryId = category?.id || (typeof crypto.randomUUID === "function" ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15));
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await uploadCategoryImageAction(categoryId, formData);
+      if (res.success) {
+        const successRes = res as { success: true; storagePath: string; publicUrl: string };
+        setImagePath(successRes.storagePath);
+        setImagePreview(successRes.publicUrl);
+        toast.success("Category image uploaded");
+      } else {
+        toast.error((res as { error: string }).error || "Failed to upload image");
+      }
+    } catch {
+      toast.error("Network error uploading image");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleRemoveImage = async () => {
+    if (!imagePath) return;
+    setUploadingImage(true);
+    try {
+      await removeCategoryImageAction(imagePath);
+      setImagePath(null);
+      setImagePreview(null);
+      toast.success("Category image removed");
+    } catch {
+      toast.error("Failed to remove image");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -58,6 +117,7 @@ export function CategoryDialog({
       name,
       slug,
       description: description || null,
+      image_path: imagePath || null,
       active,
     });
 
@@ -149,6 +209,72 @@ export function CategoryDialog({
                 aria-label="Description"
               />
               {errors.description && <FieldError className="text-red-400 text-xs mt-1">{errors.description}</FieldError>}
+            </Field>
+
+            {/* Category Image Upload / Preview Field */}
+            <Field>
+              <FieldLabel className="text-zinc-700 dark:text-zinc-300 font-medium flex items-center justify-between">
+                <span>Category Image <span className="text-xs text-zinc-400 font-normal">(Optional)</span></span>
+              </FieldLabel>
+
+              <input
+                ref={imageInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageSelect}
+                className="hidden"
+              />
+
+              {imagePreview ? (
+                <div className="flex items-center gap-3 p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={imagePreview}
+                    alt="Category cover"
+                    className="size-14 rounded-md object-cover border border-zinc-200 dark:border-zinc-800 shrink-0"
+                  />
+                  <div className="flex flex-col gap-1 min-w-0 flex-1">
+                    <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 truncate">Cover Image Attached</span>
+                    <span className="text-[10px] text-zinc-400">Click replace to upload new image</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={uploadingImage || loading}
+                      onClick={() => imageInputRef.current?.click()}
+                      className="h-8 text-xs px-2.5 border-zinc-200 dark:border-zinc-800"
+                    >
+                      {uploadingImage ? <Loader2 className="size-3.5 animate-spin" /> : "Replace"}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      disabled={uploadingImage || loading}
+                      onClick={handleRemoveImage}
+                      className="size-8 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20"
+                      aria-label="Remove category image"
+                    >
+                      <Trash2 className="size-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  onClick={() => !uploadingImage && !loading && imageInputRef.current?.click()}
+                  className="border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 rounded-lg p-4 flex items-center justify-center gap-3 cursor-pointer bg-zinc-50/50 dark:bg-zinc-950/20 transition-colors"
+                >
+                  <div className="size-8 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center border border-zinc-200 dark:border-zinc-800 shrink-0">
+                    {uploadingImage ? <Loader2 className="size-4 animate-spin text-zinc-400" /> : <UploadCloud className="size-4 text-zinc-400" />}
+                  </div>
+                  <div className="text-left">
+                    <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200 block">Click to upload category cover image</span>
+                    <span className="text-[10px] text-zinc-400 block">PNG, JPG, JPEG or WEBP (Max 5MB)</span>
+                  </div>
+                </div>
+              )}
             </Field>
 
             <Field className="flex items-center gap-3">

@@ -11,24 +11,21 @@ interface OrderSummaryProps {
 
 export function OrderSummary({ items, store, subtotal }: OrderSummaryProps) {
   return (
-    <div className="space-y-4 bg-[#FFFFFF] dark:bg-zinc-900 border border-[#E7E7E5] dark:border-zinc-800 rounded-none p-4.5 text-left shadow-none">
+    <div className="space-y-4 bg-[#FFFFFF] dark:bg-zinc-900 border border-[#E7E7E5] dark:border-zinc-800 rounded-xl p-4.5 text-left shadow-none">
       <h3 className="text-xs font-semibold text-[#111111] dark:text-[#FAF9F7] uppercase tracking-[0.15em] border-b border-[#E7E7E5] dark:border-zinc-800 pb-2.5">
-        Order Item Summary ({items.reduce((sum, item) => sum + item.quantity, 0)})
+        Order Item Summary ({items.length})
       </h3>
       
       <div className="space-y-3 max-h-[180px] overflow-y-auto pr-1">
         {items.map((item) => (
-          <div key={item.id} className="flex justify-between items-start text-xs gap-3">
+          <div key={item.id} className="flex justify-between items-center text-xs gap-3">
             <div className="min-w-0">
               <span className="font-medium text-[#111111] dark:text-[#FAF9F7] block truncate">
                 {item.name}
               </span>
-              <span className="text-[#8A8A8A] font-normal">
-                Qty: {item.quantity} × {store.currencySymbol}{item.price.toLocaleString("en-IN")}
-              </span>
             </div>
             <span className="font-bold text-[#111111] dark:text-[#FAF9F7] shrink-0 font-mono">
-              {store.currencySymbol}{(item.price * item.quantity).toLocaleString("en-IN")}
+              {store.currencySymbol}{item.price.toLocaleString("en-IN")}
             </span>
           </div>
         ))}
