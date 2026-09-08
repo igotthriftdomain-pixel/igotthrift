@@ -16,7 +16,7 @@ export function CategoryList({
   const isAllActive = activeCategory === "all";
 
   return (
-    <div className="w-full py-4 transition-colors">
+    <div className="w-full py-2 transition-colors">
       <div className="flex items-center justify-between mb-3 px-1">
         <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-[#111111] dark:text-[#FAF9F7] flex items-center gap-2">
           <span>Shop by Category</span>
@@ -31,10 +31,10 @@ export function CategoryList({
         {/* 1. ALL PRODUCTS CARD */}
         <Link
           href={`/store/${storeSlug}?category=all#products-catalog`}
-          className={`group relative rounded-xl overflow-hidden aspect-[4/5] sm:aspect-[3/4] w-[140px] xs:w-[160px] sm:w-full shrink-0 snap-start transition-all duration-300 ease-out border cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A0A0A] ${
+          className={`group relative rounded-lg overflow-hidden aspect-[4/5] sm:aspect-[3/4] w-[140px] xs:w-[160px] sm:w-full shrink-0 snap-start transition-all duration-300 ease-out border cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A0A0A] ${
             isAllActive
-              ? "border-[#0A0A0A] dark:border-white ring-2 ring-[#0A0A0A]/30 dark:ring-white/30 shadow-md scale-[1.01]"
-              : "border-[#E7E7E5] dark:border-zinc-800 hover:border-[#111111] dark:hover:border-zinc-500 shadow-xs"
+              ? "border-[#0A0A0A] dark:border-white ring-2 ring-[#0A0A0A]/30 dark:ring-white/30 shadow-xs scale-[1.01]"
+              : "border-[#E7E7E5] dark:border-zinc-800 hover:border-[#111111] dark:hover:border-zinc-500 shadow-none"
           }`}
         >
           {/* Background Art & Gradient for ALL PRODUCTS */}
@@ -48,7 +48,7 @@ export function CategoryList({
 
           {/* Selected Badge */}
           {isAllActive && (
-            <div className="absolute top-2.5 right-2.5 z-20 bg-[#FAF9F7] text-[#0A0A0A] px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider shadow-sm flex items-center gap-1">
+            <div className="absolute top-2.5 right-2.5 z-20 bg-[#FAF9F7] text-[#0A0A0A] px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider shadow-xs flex items-center gap-1">
               <Check className="size-2.5 stroke-[3]" /> Active
             </div>
           )}
@@ -74,10 +74,10 @@ export function CategoryList({
             <Link
               key={cat.id}
               href={`/store/${storeSlug}?category=${cat.slug}#products-catalog`}
-              className={`group relative rounded-xl overflow-hidden aspect-[4/5] sm:aspect-[3/4] w-[140px] xs:w-[160px] sm:w-full shrink-0 snap-start transition-all duration-300 ease-out border cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A0A0A] ${
+              className={`group relative rounded-lg overflow-hidden aspect-[4/5] sm:aspect-[3/4] w-[140px] xs:w-[160px] sm:w-full shrink-0 snap-start transition-all duration-300 ease-out border cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A0A0A] ${
                 isActive
-                  ? "border-[#0A0A0A] dark:border-white ring-2 ring-[#0A0A0A]/30 dark:ring-white/30 shadow-md scale-[1.01]"
-                  : "border-[#E7E7E5] dark:border-zinc-800 hover:border-[#111111] dark:hover:border-zinc-500 shadow-xs"
+                  ? "border-[#0A0A0A] dark:border-white ring-2 ring-[#0A0A0A]/30 dark:ring-white/30 shadow-xs scale-[1.01]"
+                  : "border-[#E7E7E5] dark:border-zinc-800 hover:border-[#111111] dark:hover:border-zinc-500 shadow-none"
               }`}
             >
               {cat.imageUrl ? (
@@ -101,7 +101,7 @@ export function CategoryList({
 
               {/* Selected Badge */}
               {isActive && (
-                <div className="absolute top-2.5 right-2.5 z-20 bg-[#FAF9F7] text-[#0A0A0A] px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider shadow-sm flex items-center gap-1">
+                <div className="absolute top-2.5 right-2.5 z-20 bg-[#FAF9F7] text-[#0A0A0A] px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider shadow-xs flex items-center gap-1">
                   <Check className="size-2.5 stroke-[3]" /> Active
                 </div>
               )}

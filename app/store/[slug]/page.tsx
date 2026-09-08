@@ -5,7 +5,7 @@ import {
   getStoreBySlug,
   getActiveCategories,
   getFeaturedProducts,
-  getNewestProducts,
+  getAllActiveProducts,
   getProductsByCategory,
 } from "@/features/storefront/service";
 import { HeroBanner } from "@/features/storefront/components/hero-banner";
@@ -87,10 +87,10 @@ async function HeroSectionWrapper({ slug }: { slug: string }) {
   const store = await getStoreBySlug(slug);
   if (!store) return null;
 
-  // Fetch newest products just to count total items
-  const newest = await getNewestProducts(store.id);
+  // Fetch all products to count available items accurately
+  const allProducts = await getAllActiveProducts(store.id);
 
-  return <HeroBanner store={store} totalProducts={newest.length} />;
+  return <HeroBanner store={store} totalProducts={allProducts.length} />;
 }
 
 async function CatalogSectionWrapper({
@@ -109,7 +109,7 @@ async function CatalogSectionWrapper({
     getActiveCategories(storeId),
     getFeaturedProducts(storeId),
     activeCategory === "all"
-      ? getNewestProducts(storeId)
+      ? getAllActiveProducts(storeId)
       : getProductsByCategory(storeId, activeCategory),
   ]);
 
@@ -153,24 +153,24 @@ async function CatalogSectionWrapper({
 // Loading Skeletons
 function HeroSkeleton() {
   return (
-    <div className="w-full h-[500px] bg-[#0A0A0A] flex flex-col items-center justify-center space-y-4 p-8 border-b border-[#E7E7E5] dark:border-zinc-800">
-      <Skeleton className="size-24 rounded-full bg-zinc-900" />
-      <Skeleton className="h-10 w-64 bg-zinc-900" />
-      <Skeleton className="h-4 w-96 bg-zinc-900" />
-      <Skeleton className="h-12 w-44 bg-zinc-900 rounded-none border border-zinc-800" />
+    <div className="w-full h-[460px] sm:h-[520px] bg-[#0A0A0A] flex flex-col items-center justify-center space-y-4 p-8 border-b border-[#E7E7E5] dark:border-zinc-800">
+      <Skeleton className="size-20 rounded-full bg-zinc-900" />
+      <Skeleton className="h-10 w-64 bg-zinc-900 rounded-lg" />
+      <Skeleton className="h-4 w-80 sm:w-96 bg-zinc-900 rounded-md" />
+      <Skeleton className="h-12 w-44 bg-zinc-900 rounded-lg border border-zinc-800" />
     </div>
   );
 }
 
 function CatalogSkeleton() {
   return (
-    <div className="space-y-10 py-6">
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-48 bg-[#E7E7E5] dark:bg-zinc-800" />
+    <div className="space-y-10 py-4">
+      <div className="space-y-3">
+        <Skeleton className="h-4 w-48 bg-[#E7E7E5] dark:bg-zinc-800 rounded-md" />
         <div className="flex gap-3 overflow-hidden">
-          <Skeleton className="h-9 w-28 rounded-none bg-[#E7E7E5] dark:bg-zinc-800 shrink-0" />
-          <Skeleton className="h-9 w-28 rounded-none bg-[#E7E7E5] dark:bg-zinc-800 shrink-0" />
-          <Skeleton className="h-9 w-28 rounded-none bg-[#E7E7E5] dark:bg-zinc-800 shrink-0" />
+          <Skeleton className="h-24 w-32 rounded-lg bg-[#E7E7E5] dark:bg-zinc-800 shrink-0" />
+          <Skeleton className="h-24 w-32 rounded-lg bg-[#E7E7E5] dark:bg-zinc-800 shrink-0" />
+          <Skeleton className="h-24 w-32 rounded-lg bg-[#E7E7E5] dark:bg-zinc-800 shrink-0" />
         </div>
       </div>
       <GridSkeleton />
@@ -181,18 +181,18 @@ function CatalogSkeleton() {
 function GridSkeleton() {
   return (
     <div className="space-y-4">
-      <Skeleton className="h-7 w-48 bg-[#E7E7E5] dark:bg-zinc-800" />
-      <div className="grid gap-6 grid-cols-2 md:grid-cols-4">
+      <Skeleton className="h-6 w-48 bg-[#E7E7E5] dark:bg-zinc-800 rounded-md" />
+      <div className="grid gap-5 sm:gap-7 lg:gap-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="border border-[#E7E7E5] dark:border-zinc-800 rounded-none overflow-hidden p-3 space-y-4 bg-[#FFFFFF] dark:bg-zinc-900"
+            className="border border-[#E7E7E5] dark:border-zinc-800 rounded-lg overflow-hidden p-4 space-y-4 bg-[#FFFFFF] dark:bg-zinc-900"
           >
-            <Skeleton className="aspect-[4/5] w-full rounded-none bg-[#E7E7E5] dark:bg-zinc-800" />
-            <Skeleton className="h-4 w-3/4 bg-[#E7E7E5] dark:bg-zinc-800" />
-            <div className="flex justify-between items-center">
-              <Skeleton className="h-5 w-16 bg-[#E7E7E5] dark:bg-zinc-800" />
-              <Skeleton className="h-9 w-24 rounded-none bg-[#E7E7E5] dark:bg-zinc-800" />
+            <Skeleton className="aspect-[4/5] w-full rounded-md bg-[#E7E7E5] dark:bg-zinc-800" />
+            <Skeleton className="h-4 w-3/4 bg-[#E7E7E5] dark:bg-zinc-800 rounded-md" />
+            <div className="flex justify-between items-center pt-2">
+              <Skeleton className="h-5 w-16 bg-[#E7E7E5] dark:bg-zinc-800 rounded-md" />
+              <Skeleton className="h-9 w-full rounded-lg bg-[#E7E7E5] dark:bg-zinc-800" />
             </div>
           </div>
         ))}

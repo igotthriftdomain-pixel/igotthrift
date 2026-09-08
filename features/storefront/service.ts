@@ -205,6 +205,26 @@ export async function getNewestProducts(storeId: string): Promise<StorefrontProd
   return mapRowsToDTOs(res.results || []);
 }
 
+export async function getAllActiveProducts(storeId: string): Promise<StorefrontProduct[]> {
+  const db = getDb();
+  const nowIso = new Date().toISOString();
+
+  const res = await db
+    .prepare(
+      `SELECT p.*, c.name as category_name, c.slug as category_slug
+       FROM products p
+       LEFT JOIN categories c ON p.category_id = c.id
+       WHERE p.store_id = ? AND p.active = 1
+         AND (p.published_at IS NULL OR p.published_at <= ?)
+         AND p.deleted_at IS NULL
+       ORDER BY p.created_at DESC`
+    )
+    .bind(storeId, nowIso)
+    .all<RawProductRow>();
+
+  return mapRowsToDTOs(res.results || []);
+}
+
 export async function getProductsByCategory(
   storeId: string,
   categorySlug: string

@@ -15,7 +15,6 @@ export function ProductCard({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const isSoldOut = product.stockQuantity <= 0;
-  const isLowStock = product.stockQuantity > 0 && product.stockQuantity < 3;
   const hasDiscount = product.compareAtPrice !== null && product.compareAtPrice > product.price;
 
   // Build complete array of image URLs
@@ -25,8 +24,6 @@ export function ProductCard({
       : product.primaryImageUrl
       ? [product.primaryImageUrl]
       : [];
-
-  const activeImageUrl = imageList[currentImageIndex] || product.primaryImageUrl;
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -41,19 +38,27 @@ export function ProductCard({
   };
 
   return (
-    <div className="group flex flex-col bg-[#FFFFFF] dark:bg-zinc-900/90 border border-[#E7E7E5] dark:border-zinc-800 rounded-xl overflow-hidden transition-all duration-200 ease-out hover:border-[#111111] dark:hover:border-zinc-600 hover:shadow-xs relative">
+    <div className="group flex flex-col bg-[#FFFFFF] dark:bg-zinc-900/90 border border-[#E7E7E5] dark:border-zinc-800 rounded-lg overflow-hidden transition-all duration-200 ease-out hover:border-[#111111] dark:hover:border-zinc-600 hover:shadow-xs relative">
       {/* Image container with 4:5 editorial aspect ratio */}
       <Link
         href={`/store/${store.slug}/product/${product.slug}`}
         className="relative aspect-[4/5] bg-[#F6F6F4] dark:bg-zinc-950 overflow-hidden flex items-center justify-center border-b border-[#E7E7E5] dark:border-zinc-800 block"
       >
-        {activeImageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={activeImageUrl}
-            alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-          />
+        {imageList.length > 0 ? (
+          imageList.map((url, idx) => {
+            const isActive = idx === currentImageIndex;
+            return (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={url}
+                src={url}
+                alt={product.name}
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-out group-hover:scale-[1.03] ${
+                  isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                }`}
+              />
+            );
+          })
         ) : (
           <ShoppingBag className="size-10 text-[#8A8A8A]" />
         )}
@@ -94,7 +99,7 @@ export function ProductCard({
         )}
 
         {/* Status badges overlay */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-20">
           {product.featured && (
             <span className="bg-[#0A0A0A] text-[#FFFFFF] text-[9px] font-bold uppercase tracking-[0.2em] py-1 px-2.5 rounded-md shadow-xs">
               Featured
@@ -108,14 +113,14 @@ export function ProductCard({
         </div>
 
         {hasDiscount && !isSoldOut && product.compareAtPrice && (
-          <div className="absolute top-3 right-3 bg-[#0A0A0A] text-white text-[9px] font-bold py-1 px-2.5 z-10 uppercase tracking-[0.15em] rounded-md shadow-xs">
+          <div className="absolute top-3 right-3 bg-[#0A0A0A] text-white text-[9px] font-bold py-1 px-2.5 z-20 uppercase tracking-[0.15em] rounded-md shadow-xs">
             -{Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}%
           </div>
         )}
 
         {/* Quick view hover indicator */}
         {imageList.length <= 1 && (
-          <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out bg-[#0A0A0A] text-[#FFFFFF] size-8 rounded-md flex items-center justify-center shadow-xs">
+          <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out bg-[#0A0A0A] text-[#FFFFFF] size-8 rounded-md flex items-center justify-center shadow-xs z-20">
             <ArrowUpRight className="size-4" />
           </div>
         )}
@@ -138,24 +143,15 @@ export function ProductCard({
 
         <div className="space-y-3 pt-2 border-t border-[#E7E7E5] dark:border-zinc-800">
           {/* Price tags */}
-          <div className="flex flex-wrap items-baseline justify-between gap-1.5">
-            <div className="flex items-baseline gap-2">
-              <span className="text-base font-bold text-[#111111] dark:text-[#FAF9F7]">
+          <div className="flex items-baseline gap-2">
+            <span className="text-base font-bold text-[#111111] dark:text-[#FAF9F7]">
+              {store.currencySymbol}
+              {product.price.toLocaleString("en-IN")}
+            </span>
+            {hasDiscount && product.compareAtPrice && (
+              <span className="text-xs text-[#8A8A8A] line-through font-normal">
                 {store.currencySymbol}
-                {product.price.toLocaleString("en-IN")}
-              </span>
-              {hasDiscount && product.compareAtPrice && (
-                <span className="text-xs text-[#8A8A8A] line-through font-normal">
-                  {store.currencySymbol}
-                  {product.compareAtPrice.toLocaleString("en-IN")}
-                </span>
-              )}
-            </div>
-
-            {/* Stock warnings */}
-            {isLowStock && (
-              <span className="text-[9px] font-semibold text-[#111111] dark:text-zinc-300 uppercase tracking-[0.15em]">
-                Only {product.stockQuantity} left
+                {product.compareAtPrice.toLocaleString("en-IN")}
               </span>
             )}
           </div>

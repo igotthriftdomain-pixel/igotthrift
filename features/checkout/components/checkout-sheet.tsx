@@ -79,9 +79,6 @@ export function CheckoutSheet({
       return;
     }
 
-    // Open tab synchronously in response to user click to prevent desktop pop-up blockers
-    const targetTab = typeof window !== "undefined" ? window.open("about:blank", "_blank") : null;
-
     setLoading(true);
     try {
       const res = await checkoutAction(store.id, store.slug, details, checkoutItems);
@@ -92,17 +89,16 @@ export function CheckoutSheet({
         }
         setOpen(false);
 
-        if (targetTab) {
-          targetTab.location.href = res.whatsappUrl;
-        } else if (typeof window !== "undefined") {
-          window.location.href = res.whatsappUrl;
+        if (typeof window !== "undefined") {
+          const win = window.open(res.whatsappUrl, "_blank");
+          if (!win) {
+            window.location.href = res.whatsappUrl;
+          }
         }
       } else {
-        if (targetTab) targetTab.close();
         toast.error(res.error);
       }
     } catch (err) {
-      if (targetTab) targetTab.close();
       console.error(err);
       toast.error("An unexpected error occurred. Please try again.");
     } finally {

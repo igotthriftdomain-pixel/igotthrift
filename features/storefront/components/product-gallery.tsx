@@ -29,24 +29,30 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
 
   if (images.length === 0) {
     return (
-      <div className="aspect-square w-full rounded-xl bg-[#F6F6F4] dark:bg-zinc-900 border border-[#E7E7E5] dark:border-zinc-800 flex items-center justify-center text-[#8A8A8A]">
+      <div className="aspect-[4/5] max-h-[460px] w-full rounded-lg bg-[#F6F6F4] dark:bg-zinc-900 border border-[#E7E7E5] dark:border-zinc-800 flex items-center justify-center text-[#8A8A8A]">
         <ShoppingBag className="size-16" />
       </div>
     );
   }
 
-  const activeImage = images[activeIndex];
-
   return (
     <div className="space-y-4">
-      {/* Primary Display Frame with 4:5 aspect ratio */}
-      <div className="relative aspect-[4/5] max-h-[460px] w-full mx-auto rounded-xl overflow-hidden border border-[#E7E7E5] dark:border-zinc-800 bg-[#F6F6F4] dark:bg-zinc-950 flex items-center justify-center group shadow-xs">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={activeImage.publicUrl}
-          alt={`Product drop view ${activeIndex + 1}`}
-          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-        />
+      {/* Primary Display Frame with 4:5 aspect ratio & crossfade transitions */}
+      <div className="relative aspect-[4/5] max-h-[460px] w-full mx-auto rounded-lg overflow-hidden border border-[#E7E7E5] dark:border-zinc-800 bg-[#F6F6F4] dark:bg-zinc-950 flex items-center justify-center group shadow-xs">
+        {images.map((img, idx) => {
+          const isActive = idx === activeIndex;
+          return (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={img.storagePath || img.publicUrl}
+              src={img.publicUrl}
+              alt={`Product drop view ${idx + 1}`}
+              className={`absolute inset-0 w-full h-full object-cover transition-all duration-300 ease-out group-hover:scale-[1.03] ${
+                isActive ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+              }`}
+            />
+          );
+        })}
 
         {/* Carousel overlay arrow triggers (Only if > 1 image) */}
         {images.length > 1 && (
@@ -54,7 +60,7 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
             <Button
               variant="outline"
               size="icon"
-              className="absolute left-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 ease-out size-9 rounded-md border-[#E7E7E5] bg-[#0A0A0A] text-white hover:bg-[#171717] active:scale-95 cursor-pointer shadow-xs"
+              className="absolute left-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 ease-out size-9 rounded-md border-[#E7E7E5] bg-[#0A0A0A] text-white hover:bg-[#171717] active:scale-95 cursor-pointer shadow-xs z-20"
               onClick={() => setActiveIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1))}
               aria-label="Previous image"
             >
@@ -63,7 +69,7 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
             <Button
               variant="outline"
               size="icon"
-              className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 ease-out size-9 rounded-md border-[#E7E7E5] bg-[#0A0A0A] text-white hover:bg-[#171717] active:scale-95 cursor-pointer shadow-xs"
+              className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 ease-out size-9 rounded-md border-[#E7E7E5] bg-[#0A0A0A] text-white hover:bg-[#171717] active:scale-95 cursor-pointer shadow-xs z-20"
               onClick={() => setActiveIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))}
               aria-label="Next image"
             >
@@ -78,9 +84,9 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
         <div className="flex gap-2.5 overflow-x-auto py-1 no-scrollbar">
           {images.map((img, idx) => (
             <button
-              key={img.storagePath}
+              key={img.storagePath || img.publicUrl}
               onClick={() => setActiveIndex(idx)}
-              className={`relative size-16 shrink-0 rounded-lg overflow-hidden border cursor-pointer transition-all duration-200 ease-out ${
+              className={`relative size-16 shrink-0 rounded-md overflow-hidden border cursor-pointer transition-all duration-200 ease-out ${
                 idx === activeIndex
                   ? "border-[#0A0A0A] dark:border-white ring-2 ring-[#0A0A0A] dark:ring-white scale-100"
                   : "border-[#E7E7E5] dark:border-zinc-800 opacity-60 hover:opacity-100 scale-95"
@@ -100,4 +106,3 @@ export function ProductGallery({ images }: { images: GalleryImage[] }) {
     </div>
   );
 }
-

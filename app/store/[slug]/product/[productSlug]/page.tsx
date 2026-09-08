@@ -216,10 +216,10 @@ async function RelatedProductsWrapper({
 function GallerySkeleton() {
   return (
     <div className="space-y-4">
-      <Skeleton className="aspect-[4/5] w-full bg-[#E7E7E5] dark:bg-zinc-800" />
-      <div className="flex gap-3">
-        <Skeleton className="size-20 bg-[#E7E7E5] dark:bg-zinc-800" />
-        <Skeleton className="size-20 bg-[#E7E7E5] dark:bg-zinc-800" />
+      <Skeleton className="aspect-[4/5] max-h-[460px] w-full rounded-lg bg-[#E7E7E5] dark:bg-zinc-800" />
+      <div className="flex gap-2.5">
+        <Skeleton className="size-16 rounded-md bg-[#E7E7E5] dark:bg-zinc-800" />
+        <Skeleton className="size-16 rounded-md bg-[#E7E7E5] dark:bg-zinc-800" />
       </div>
     </div>
   );
@@ -228,18 +228,18 @@ function GallerySkeleton() {
 function GridSkeleton() {
   return (
     <div className="space-y-4 pt-10 border-t border-[#E7E7E5] dark:border-zinc-800">
-      <Skeleton className="h-6 w-48 bg-[#E7E7E5] dark:bg-zinc-800" />
-      <div className="grid gap-6 grid-cols-2 md:grid-cols-4">
+      <Skeleton className="h-6 w-48 bg-[#E7E7E5] dark:bg-zinc-800 rounded-md" />
+      <div className="grid gap-5 sm:gap-7 lg:gap-8 grid-cols-2 md:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="border border-[#E7E7E5] dark:border-zinc-800 overflow-hidden p-3 space-y-4 bg-white dark:bg-zinc-900"
+            className="border border-[#E7E7E5] dark:border-zinc-800 rounded-lg overflow-hidden p-4 space-y-4 bg-white dark:bg-zinc-900"
           >
-            <Skeleton className="aspect-[4/5] w-full bg-[#E7E7E5] dark:bg-zinc-800" />
-            <Skeleton className="h-4 w-3/4 bg-[#E7E7E5] dark:bg-zinc-800" />
-            <div className="flex justify-between items-center">
-              <Skeleton className="h-5 w-16 bg-[#E7E7E5] dark:bg-zinc-800" />
-              <Skeleton className="h-9 w-24 bg-[#E7E7E5] dark:bg-zinc-800" />
+            <Skeleton className="aspect-[4/5] w-full rounded-md bg-[#E7E7E5] dark:bg-zinc-800" />
+            <Skeleton className="h-4 w-3/4 bg-[#E7E7E5] dark:bg-zinc-800 rounded-md" />
+            <div className="flex justify-between items-center pt-2">
+              <Skeleton className="h-5 w-16 bg-[#E7E7E5] dark:bg-zinc-800 rounded-md" />
+              <Skeleton className="h-9 w-full rounded-lg bg-[#E7E7E5] dark:bg-zinc-800" />
             </div>
           </div>
         ))}
