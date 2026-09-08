@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/features/auth/service";
 import { getStoreByOwner } from "@/features/store/service";
+import { getDb } from "@/lib/db";
 import { productSchema, type ProductInput } from "./schema";
 import {
   createProduct,
@@ -23,6 +24,17 @@ export async function createProductAction(productId: string, data: ProductInput)
   const validation = productSchema.safeParse(data);
   if (!validation.success) {
     return { success: false, error: validation.error.issues[0].message };
+  }
+
+  if (validation.data.category_id) {
+    const db = getDb();
+    const catRow = await db
+      .prepare("SELECT id FROM categories WHERE id = ? AND store_id = ?")
+      .bind(validation.data.category_id, store.id)
+      .first();
+    if (!catRow) {
+      return { success: false, error: "Selected category does not belong to your store." };
+    }
   }
 
   try {
@@ -48,6 +60,17 @@ export async function updateProductAction(productId: string, data: ProductInput)
   const validation = productSchema.safeParse(data);
   if (!validation.success) {
     return { success: false, error: validation.error.issues[0].message };
+  }
+
+  if (validation.data.category_id) {
+    const db = getDb();
+    const catRow = await db
+      .prepare("SELECT id FROM categories WHERE id = ? AND store_id = ?")
+      .bind(validation.data.category_id, store.id)
+      .first();
+    if (!catRow) {
+      return { success: false, error: "Selected category does not belong to your store." };
+    }
   }
 
   try {

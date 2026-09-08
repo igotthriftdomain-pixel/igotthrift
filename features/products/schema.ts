@@ -19,7 +19,7 @@ export const productSchema = z
     compare_at_price: z.number().min(0, "Compare-at price must be greater than or equal to 0").nullable().optional(),
     sku: z.string().max(CHARACTER_LIMITS.sku, `SKU cannot exceed ${CHARACTER_LIMITS.sku} characters`).nullable().optional(),
     stock: z.number().int().min(0, "Stock quantity cannot be negative"),
-    category_id: z.string().uuid("Invalid category selection"),
+    category_id: z.string().min(1, "Please select a valid store category"),
     featured: z.boolean().default(false),
     active: z.boolean().default(true),
     published_at: z.string().nullable().optional(),
