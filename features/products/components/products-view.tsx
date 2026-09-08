@@ -135,62 +135,105 @@ export function ProductsView({
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 items-center bg-zinc-50/50 dark:bg-zinc-950/20 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800">
           {/* Category Filter */}
           <div className="w-full">
-            <Select value={category} onValueChange={(val) => updateParam("category", val || "all")}>
-              <SelectTrigger className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
-                <SelectItem value="all" className="cursor-pointer">All Categories</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id} className="cursor-pointer">
-                    {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {(() => {
+              const selectedCatName = category === "all" ? "All Categories" : categories.find((c) => c.id === category)?.name;
+              return (
+                <Select value={category} onValueChange={(val) => updateParam("category", val || "all")}>
+                  <SelectTrigger className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
+                    <SelectValue placeholder="All Categories">
+                      {selectedCatName}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
+                    <SelectItem value="all" className="cursor-pointer">All Categories</SelectItem>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id} className="cursor-pointer">
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              );
+            })()}
           </div>
 
           {/* Status Filter */}
           <div className="w-full">
-            <Select value={status} onValueChange={(val) => updateParam("status", val || "all")}>
-              <SelectTrigger className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
-                <SelectItem value="all" className="cursor-pointer">All Status</SelectItem>
-                <SelectItem value="published" className="cursor-pointer">Published</SelectItem>
-                <SelectItem value="draft" className="cursor-pointer">Draft</SelectItem>
-                <SelectItem value="scheduled" className="cursor-pointer">Scheduled</SelectItem>
-              </SelectContent>
-            </Select>
+            {(() => {
+              const statusLabels: Record<string, string> = {
+                all: "All Status",
+                published: "Published",
+                draft: "Draft",
+                scheduled: "Scheduled",
+              };
+              return (
+                <Select value={status} onValueChange={(val) => updateParam("status", val || "all")}>
+                  <SelectTrigger className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
+                    <SelectValue placeholder="All Status">
+                      {statusLabels[status] || "All Status"}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
+                    <SelectItem value="all" className="cursor-pointer">All Status</SelectItem>
+                    <SelectItem value="published" className="cursor-pointer">Published</SelectItem>
+                    <SelectItem value="draft" className="cursor-pointer">Draft</SelectItem>
+                    <SelectItem value="scheduled" className="cursor-pointer">Scheduled</SelectItem>
+                  </SelectContent>
+                </Select>
+              );
+            })()}
           </div>
 
           {/* Featured Filter */}
           <div className="w-full">
-            <Select value={featured} onValueChange={(val) => updateParam("featured", val || "all")}>
-              <SelectTrigger className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
-                <SelectValue placeholder="All Featured" />
-              </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
-                <SelectItem value="all" className="cursor-pointer">All Featured</SelectItem>
-                <SelectItem value="true" className="cursor-pointer">Featured</SelectItem>
-              </SelectContent>
-            </Select>
+            {(() => {
+              const featuredLabels: Record<string, string> = {
+                all: "All Featured",
+                true: "Featured Only",
+                false: "Non-Featured",
+              };
+              return (
+                <Select value={featured} onValueChange={(val) => updateParam("featured", val || "all")}>
+                  <SelectTrigger className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
+                    <SelectValue placeholder="All Featured">
+                      {featuredLabels[featured] || "All Featured"}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
+                    <SelectItem value="all" className="cursor-pointer">All Featured</SelectItem>
+                    <SelectItem value="true" className="cursor-pointer">Featured Only</SelectItem>
+                    <SelectItem value="false" className="cursor-pointer">Non-Featured</SelectItem>
+                  </SelectContent>
+                </Select>
+              );
+            })()}
           </div>
 
-          {/* Sorting */}
+          {/* Sort Filter */}
           <div className="w-full">
-            <Select value={sort} onValueChange={(val) => updateParam("sort", val || "created_desc")}>
-              <SelectTrigger className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
-                <SelectValue placeholder="Sort By" />
-              </SelectTrigger>
-              <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
-                <SelectItem value="created_desc" className="cursor-pointer">Newest Added</SelectItem>
-                <SelectItem value="price_asc" className="cursor-pointer">Price: Low to High</SelectItem>
-                <SelectItem value="price_desc" className="cursor-pointer">Price: High to Low</SelectItem>
-                <SelectItem value="stock_asc" className="cursor-pointer">Stock: Low to High</SelectItem>
-              </SelectContent>
-            </Select>
+            {(() => {
+              const sortLabels: Record<string, string> = {
+                newest: "Newest First",
+                price_asc: "Price: Low to High",
+                price_desc: "Price: High to Low",
+                stock_asc: "Stock: Low to High",
+              };
+              return (
+                <Select value={sort} onValueChange={(val) => updateParam("sort", val || "newest")}>
+                  <SelectTrigger className="bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800">
+                    <SelectValue placeholder="Sort By">
+                      {sortLabels[sort] || "Newest First"}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
+                    <SelectItem value="newest" className="cursor-pointer">Newest First</SelectItem>
+                    <SelectItem value="price_asc" className="cursor-pointer">Price: Low to High</SelectItem>
+                    <SelectItem value="price_desc" className="cursor-pointer">Price: High to Low</SelectItem>
+                    <SelectItem value="stock_asc" className="cursor-pointer">Stock: Low to High</SelectItem>
+                  </SelectContent>
+                </Select>
+              );
+            })()}
           </div>
         </div>
       )}

@@ -101,7 +101,13 @@ export function ProductEditorForm({
   );
 
   // Organization Fields
-  const [categoryId, setCategoryId] = useState(initialProduct?.category_id || "");
+  const [categoryId, setCategoryId] = useState(() => {
+    const initialId = initialProduct?.category_id || "";
+    if (initialId && categories.length > 0 && !categories.some((c) => c.id === initialId)) {
+      return "";
+    }
+    return initialId;
+  });
 
   // Visibility Fields
   const [featured, setFeatured] = useState<boolean>(Boolean(initialProduct?.featured ?? false));
@@ -906,22 +912,34 @@ export function ProductEditorForm({
               <FieldGroup className="space-y-4">
                 <Field>
                   <FieldLabel className="text-zinc-700 dark:text-zinc-300 font-medium">Store Category</FieldLabel>
-                  <Select
-                    value={categoryId}
-                    onValueChange={(val) => setCategoryId(val || "")}
-                    disabled={saving}
-                  >
-                    <SelectTrigger className="w-full h-10 bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-50">
-                      <SelectValue placeholder="Select Category" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
-                      {categories.map((cat) => (
-                        <SelectItem key={cat.id} value={cat.id} className="cursor-pointer">
-                          {cat.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {(() => {
+                    const selectedCat = categories.find((cat) => cat.id === categoryId);
+                    return (
+                      <Select
+                        value={categoryId}
+                        onValueChange={(val) => {
+                          setCategoryId(val || "");
+                          if (errors.category_id) {
+                            setErrors((prev) => ({ ...prev, category_id: "" }));
+                          }
+                        }}
+                        disabled={saving}
+                      >
+                        <SelectTrigger className="w-full h-10 bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-50">
+                          <SelectValue placeholder="Select Category">
+                            {selectedCat ? selectedCat.name : undefined}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100">
+                          {categories.map((cat) => (
+                            <SelectItem key={cat.id} value={cat.id} className="cursor-pointer">
+                              {cat.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    );
+                  })()}
                   {errors.category_id && <FieldError className="text-red-400 text-xs mt-1">{errors.category_id}</FieldError>}
                 </Field>
 
