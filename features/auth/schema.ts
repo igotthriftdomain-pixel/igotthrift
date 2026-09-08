@@ -10,6 +10,7 @@ export type LoginInput = z.infer<typeof loginSchema>;
 
 export const changePasswordSchema = z
   .object({
+    currentPassword: z.string().optional(),
     newPassword: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(6, "Confirm password is required"),
   })
@@ -28,6 +29,7 @@ export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 
 export const resetPasswordSchema = z
   .object({
+    token: z.string().optional(),
     newPassword: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(6, "Confirm password is required"),
   })

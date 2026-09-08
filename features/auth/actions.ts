@@ -1,8 +1,17 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
-import { getCurrentUser } from "./service";
+import { headers } from "next/headers";
+import {
+  hashPassword,
+  verifyPassword,
+  setAuthCookie,
+  clearAuthCookie,
+  getCurrentUser,
+  requestPasswordReset,
+  resetPassword,
+} from "@/lib/auth";
+import { getDb } from "@/lib/db";
 import {
   loginSchema,
   changePasswordSchema,
@@ -14,40 +23,48 @@ import {
   type ResetPasswordInput,
 } from "./schema";
 
-export async function loginAction(data: LoginInput) {
+export async function loginAction(data: LoginInput): Promise<{ success: boolean; error?: string }> {
   const result = loginSchema.safeParse(data);
   if (!result.success) {
     return { success: false, error: result.error.issues[0].message };
   }
 
   const { email, password } = result.data;
-  const supabase = await createClient();
+  const normalizedEmail = email.trim().toLowerCase();
+  const db = getDb();
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  const user = await db
+    .prepare("SELECT id, email, password_hash FROM users WHERE LOWER(email) = ?")
+    .bind(normalizedEmail)
+    .first<{ id: string; email: string; password_hash: string }>();
 
-  if (error) {
-    return { success: false, error: error.message };
+  if (!user) {
+    return { success: false, error: "Invalid email or password" };
   }
+
+  const isValid = await verifyPassword(password, user.password_hash);
+  if (!isValid) {
+    return { success: false, error: "Invalid email or password" };
+  }
+
+  await setAuthCookie(user.id);
 
   revalidatePath("/dashboard");
   return { success: true };
 }
 
-export async function logoutAction() {
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    return { success: false, error: error.message };
+export async function logoutAction(): Promise<{ success: boolean; error?: string }> {
+  try {
+    await clearAuthCookie();
+    revalidatePath("/login");
+    return { success: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Logout failed";
+    return { success: false, error: message };
   }
-
-  revalidatePath("/login");
-  return { success: true };
 }
 
-export async function changePasswordAction(data: ChangePasswordInput) {
+export async function changePasswordAction(data: ChangePasswordInput): Promise<{ success: boolean; error?: string }> {
   const user = await getCurrentUser();
   if (!user) {
     return { success: false, error: "Unauthorized. Please log in first." };
@@ -58,21 +75,39 @@ export async function changePasswordAction(data: ChangePasswordInput) {
     return { success: false, error: result.error.issues[0].message };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.updateUser({
-    password: result.data.newPassword,
-  });
+  const db = getDb();
+  const userRow = await db
+    .prepare("SELECT password_hash FROM users WHERE id = ?")
+    .bind(user.id)
+    .first<{ password_hash: string }>();
 
-  if (error) {
-    return { success: false, error: error.message };
+  if (!userRow) {
+    return { success: false, error: "User not found" };
   }
+
+  if (data.currentPassword) {
+    const isValid = await verifyPassword(data.currentPassword, userRow.password_hash);
+    if (!isValid) {
+      return { success: false, error: "Current password is incorrect." };
+    }
+  }
+
+  const newHash = await hashPassword(result.data.newPassword);
+
+  await db
+    .prepare("UPDATE users SET password_hash = ?, updated_at = datetime('now') WHERE id = ?")
+    .bind(newHash, user.id)
+    .run();
+
+  await setAuthCookie(user.id);
 
   return { success: true };
 }
 
-import { headers } from "next/headers";
-
-export async function requestPasswordResetAction(data: ForgotPasswordInput, clientOrigin?: string) {
+export async function requestPasswordResetAction(
+  data: ForgotPasswordInput,
+  clientOrigin?: string
+): Promise<{ success: boolean; message?: string; error?: string }> {
   const result = forgotPasswordSchema.safeParse(data);
   if (!result.success) {
     return { success: false, error: result.error.issues[0].message };
@@ -83,42 +118,30 @@ export async function requestPasswordResetAction(data: ForgotPasswordInput, clie
   const proto = headerList.get("x-forwarded-proto") || "http";
   const origin = host ? `${proto}://${host}` : clientOrigin || "http://localhost:3000";
 
-  const supabase = await createClient();
-  const redirectUrl = `${origin}/auth/callback?next=/reset-password`;
+  await requestPasswordReset(result.data.email, origin);
 
-  const { error } = await supabase.auth.resetPasswordForEmail(result.data.email, {
-    redirectTo: redirectUrl,
-  });
-
-  if (error) {
-    console.error("Password reset error:", error.message);
-  }
-
-  // Always return neutral response to prevent user enumeration
   return {
     success: true,
     message: "If an account exists for this email, a password reset link has been sent.",
   };
 }
 
-export async function resetPasswordAction(data: ResetPasswordInput) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return { success: false, error: "Session expired or invalid token. Please request a new link." };
-  }
-
+export async function resetPasswordAction(
+  data: ResetPasswordInput
+): Promise<{ success: boolean; error?: string }> {
   const result = resetPasswordSchema.safeParse(data);
   if (!result.success) {
     return { success: false, error: result.error.issues[0].message };
   }
 
-  const supabase = await createClient();
-  const { error } = await supabase.auth.updateUser({
-    password: result.data.newPassword,
-  });
+  const token = data.token;
+  if (!token) {
+    return { success: false, error: "Invalid or missing reset token." };
+  }
 
-  if (error) {
-    return { success: false, error: error.message };
+  const res = await resetPassword(token, result.data.newPassword);
+  if (!res.success) {
+    return { success: false, error: res.error || "Failed to reset password." };
   }
 
   return { success: true };

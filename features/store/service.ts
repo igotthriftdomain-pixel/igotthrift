@@ -1,123 +1,132 @@
-import { createClient } from "@/lib/supabase/server";
+import { getDb } from "@/lib/db";
+import {
+  getPublicUrl,
+  uploadStorageAsset,
+  removeStorageAsset,
+  getExtensionFromMimeType,
+  getStorage,
+} from "@/lib/storage";
 import { type Store } from "./types";
 import { type StoreSettingsInput } from "./schema";
 
 export async function getStoreByOwner(userId: string): Promise<Store | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("stores")
-    .select("*")
-    .eq("owner_id", userId)
-    .single();
+  const db = getDb();
+  const store = await db
+    .prepare("SELECT * FROM stores WHERE owner_id = ?")
+    .bind(userId)
+    .first<Record<string, unknown>>();
 
-  if (error || !data) return null;
-  return data as Store;
+  if (!store) return null;
+
+  return {
+    ...store,
+    active: Boolean(store.active),
+  } as unknown as Store;
 }
 
 export async function getStoreSettings(userId: string) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("stores")
-    .select("*")
-    .eq("owner_id", userId)
-    .single();
+  const store = await getStoreByOwner(userId);
+  if (!store) return null;
 
-  if (error || !data) return null;
-
-  const store = data as Store;
-  const logoPublicUrl = store.logo_url
-    ? supabase.storage.from("store-assets").getPublicUrl(store.logo_url).data.publicUrl
-    : null;
-
-  let bannerPublicUrl1 = store.banner_url
-    ? supabase.storage.from("store-assets").getPublicUrl(store.banner_url).data.publicUrl
-    : null;
-  let bannerPublicUrl2: string | null = null;
-
-  // Check storage files for slide 1 and slide 2
-  const { data: files } = await supabase.storage
-    .from("store-assets")
-    .list(`stores/${store.id}`);
-
-  if (files && files.length > 0) {
-    const f1 = files.find((f) => f.name.startsWith("banner_1."));
-    const f2 = files.find((f) => f.name.startsWith("banner_2."));
-
-    if (f1) {
-      bannerPublicUrl1 = supabase.storage
-        .from("store-assets")
-        .getPublicUrl(`stores/${store.id}/${f1.name}`).data.publicUrl;
-    }
-    if (f2) {
-      bannerPublicUrl2 = supabase.storage
-        .from("store-assets")
-        .getPublicUrl(`stores/${store.id}/${f2.name}`).data.publicUrl;
-    }
-  }
+  const logoPublicUrl = getPublicUrl(store.logo_url);
+  const bannerPublicUrl1 = getPublicUrl(store.banner_url);
 
   return {
     store,
     logoPublicUrl,
     bannerPublicUrl: bannerPublicUrl1,
     bannerPublicUrl1,
-    bannerPublicUrl2,
+    bannerPublicUrl2: null as string | null,
   };
 }
 
 export async function updateStoreSettings(userId: string, data: StoreSettingsInput) {
-  const supabase = await createClient();
+  const db = getDb();
   const store = await getStoreByOwner(userId);
-  if (!store) throw new Error("Store not found");
+  if (!store) throw new Error("Store not found or unauthorized");
 
-  const { data: updated, error } = await supabase
-    .from("stores")
-    .update({
-      name: data.name,
-      tagline: data.tagline ? data.tagline.trim() || null : null,
-      description: data.description,
-      whatsapp_number: data.whatsapp_number,
-      address: data.address,
-      theme_color: data.theme_color,
-      currency_code: data.currency_code,
-      currency_symbol: data.currency_symbol,
-      website: data.website,
-      instagram: data.instagram,
-      facebook: data.facebook,
-      meta_title: data.meta_title,
-      meta_description: data.meta_description,
-    })
-    .eq("id", store.id)
-    .select()
-    .single();
+  const tagline = data.tagline ? data.tagline.trim() || null : null;
+  const description = data.description ? data.description.trim() || null : null;
+  const address = data.address ? data.address.trim() || null : null;
+  const website = data.website ? data.website.trim() || null : null;
+  const instagram = data.instagram ? data.instagram.trim() || null : null;
+  const facebook = data.facebook ? data.facebook.trim() || null : null;
+  const metaTitle = data.meta_title ? data.meta_title.trim() || null : null;
+  const metaDescription = data.meta_description ? data.meta_description.trim() || null : null;
 
-  if (error) throw new Error(error.message);
-  return updated as Store;
+  await db
+    .prepare(
+      `UPDATE stores SET
+        name = ?,
+        tagline = ?,
+        description = ?,
+        whatsapp_number = ?,
+        address = ?,
+        theme_color = ?,
+        currency_code = ?,
+        currency_symbol = ?,
+        website = ?,
+        instagram = ?,
+        facebook = ?,
+        meta_title = ?,
+        meta_description = ?,
+        updated_at = datetime('now')
+      WHERE id = ? AND owner_id = ?`
+    )
+    .bind(
+      data.name.trim(),
+      tagline,
+      description,
+      data.whatsapp_number.trim(),
+      address,
+      data.theme_color,
+      data.currency_code,
+      data.currency_symbol,
+      website,
+      instagram,
+      facebook,
+      metaTitle,
+      metaDescription,
+      store.id,
+      userId
+    )
+    .run();
+
+  const updatedStore = await getStoreByOwner(userId);
+  if (!updatedStore) throw new Error("Failed to retrieve updated store");
+  return updatedStore;
 }
 
 export async function uploadLogo(userId: string, fileBuffer: Buffer, contentType: string) {
-  const supabase = await createClient();
+  const db = getDb();
   const store = await getStoreByOwner(userId);
-  if (!store) throw new Error("Store not found");
+  if (!store) throw new Error("Store not found or unauthorized");
 
-  const storagePath = `stores/${store.id}/logo.png`;
+  const ext = getExtensionFromMimeType(contentType);
+  const storagePath = `stores/${store.id}/logo.${ext}`;
 
-  const { error: uploadError } = await supabase.storage
-    .from("store-assets")
-    .upload(storagePath, fileBuffer, {
-      contentType,
-      upsert: true,
-    });
+  // If previous logo exists with a different extension, delete it
+  if (store.logo_url && store.logo_url !== storagePath) {
+    try {
+      await removeStorageAsset(store.id, store.logo_url);
+    } catch {
+      // Ignore if missing
+    }
+  }
 
-  if (uploadError) throw new Error(uploadError.message);
+  const { publicUrl } = await uploadStorageAsset({
+    storeId: store.id,
+    pathKey: storagePath,
+    buffer: fileBuffer,
+    contentType,
+  });
 
-  const { error: updateError } = await supabase
-    .from("stores")
-    .update({ logo_url: storagePath })
-    .eq("id", store.id);
+  await db
+    .prepare("UPDATE stores SET logo_url = ?, updated_at = datetime('now') WHERE id = ? AND owner_id = ?")
+    .bind(storagePath, store.id, userId)
+    .run();
 
-  if (updateError) throw new Error(updateError.message);
-
-  return storagePath;
+  return publicUrl;
 }
 
 export async function uploadBanner(
@@ -126,81 +135,83 @@ export async function uploadBanner(
   contentType: string,
   slideIndex: 1 | 2 = 1
 ) {
-  const supabase = await createClient();
+  const db = getDb();
   const store = await getStoreByOwner(userId);
-  if (!store) throw new Error("Store not found");
+  if (!store) throw new Error("Store not found or unauthorized");
 
-  const extMap: Record<string, string> = {
-    "image/png": "png",
-    "image/jpeg": "jpg",
-    "image/jpg": "jpg",
-    "image/webp": "webp",
-    "video/mp4": "mp4",
-    "video/webm": "webm",
-    "video/quicktime": "mov",
-  };
-  const ext = extMap[contentType] || "png";
-
+  const ext = getExtensionFromMimeType(contentType);
   const storagePath = `stores/${store.id}/banner_${slideIndex}.${ext}`;
 
-  const { error: uploadError } = await supabase.storage
-    .from("store-assets")
-    .upload(storagePath, fileBuffer, {
-      contentType,
-      upsert: true,
-    });
-
-  if (uploadError) throw new Error(uploadError.message);
-
-  if (slideIndex === 1) {
-    await supabase
-      .from("stores")
-      .update({ banner_url: storagePath })
-      .eq("id", store.id);
+  // Delete older banner variants for this slide index if different extension
+  const prefix = `stores/${store.id}/banner_${slideIndex}.`;
+  try {
+    const storage = getStorage();
+    const existing = await storage.list({ prefix });
+    for (const obj of existing.objects) {
+      if (obj.key !== storagePath) {
+        await storage.delete(obj.key);
+      }
+    }
+  } catch {
+    // Ignore listing error
   }
 
-  return storagePath;
+  const { publicUrl } = await uploadStorageAsset({
+    storeId: store.id,
+    pathKey: storagePath,
+    buffer: fileBuffer,
+    contentType,
+  });
+
+  if (slideIndex === 1) {
+    await db
+      .prepare("UPDATE stores SET banner_url = ?, updated_at = datetime('now') WHERE id = ? AND owner_id = ?")
+      .bind(storagePath, store.id, userId)
+      .run();
+  }
+
+  return publicUrl;
 }
 
 export async function removeLogo(userId: string) {
-  const supabase = await createClient();
+  const db = getDb();
   const store = await getStoreByOwner(userId);
-  if (!store) throw new Error("Store not found");
+  if (!store) throw new Error("Store not found or unauthorized");
 
-  if (!store.logo_url) return;
+  if (store.logo_url) {
+    try {
+      await removeStorageAsset(store.id, store.logo_url);
+    } catch {
+      // Ignore missing file
+    }
+  }
 
-  const { error: deleteError } = await supabase.storage
-    .from("store-assets")
-    .remove([store.logo_url]);
-
-  if (deleteError) throw new Error(deleteError.message);
-
-  const { error: updateError } = await supabase
-    .from("stores")
-    .update({ logo_url: null })
-    .eq("id", store.id);
-
-  if (updateError) throw new Error(updateError.message);
+  await db
+    .prepare("UPDATE stores SET logo_url = NULL, updated_at = datetime('now') WHERE id = ? AND owner_id = ?")
+    .bind(store.id, userId)
+    .run();
 }
 
 export async function removeBanner(userId: string, slideIndex: 1 | 2 = 1) {
-  const supabase = await createClient();
+  const db = getDb();
   const store = await getStoreByOwner(userId);
-  if (!store) throw new Error("Store not found");
+  if (!store) throw new Error("Store not found or unauthorized");
 
-  await supabase.storage.from("store-assets").remove([
-    `stores/${store.id}/banner_${slideIndex}.png`,
-    `stores/${store.id}/banner_${slideIndex}.jpg`,
-    `stores/${store.id}/banner_${slideIndex}.jpeg`,
-    `stores/${store.id}/banner_${slideIndex}.webp`,
-    `stores/${store.id}/banner_${slideIndex}.mp4`,
-    `stores/${store.id}/banner_${slideIndex}.webm`,
-  ]);
+  const prefix = `stores/${store.id}/banner_${slideIndex}.`;
+  try {
+    const storage = getStorage();
+    const existing = await storage.list({ prefix });
+    for (const obj of existing.objects) {
+      await storage.delete(obj.key);
+    }
+  } catch {
+    // Ignore error
+  }
 
   if (slideIndex === 1) {
-    await supabase
-      .from("stores")
-      .update({ banner_url: null })
-      .eq("id", store.id);
+    await db
+      .prepare("UPDATE stores SET banner_url = NULL, updated_at = datetime('now') WHERE id = ? AND owner_id = ?")
+      .bind(store.id, userId)
+      .run();
   }
 }

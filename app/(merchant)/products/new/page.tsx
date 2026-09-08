@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
-import crypto from "crypto";
 import { getCurrentUser } from "@/features/auth/service";
 import { getStoreByOwner } from "@/features/store/service";
 import { ProductEditorForm } from "@/features/products/components/product-editor-form";
-import { createClient } from "@/lib/supabase/server";
+import { getDb } from "@/lib/db";
+import { type Category } from "@/features/categories/types";
 
 export default async function NewProductPage() {
   const user = await getCurrentUser();
@@ -20,17 +20,26 @@ export default async function NewProductPage() {
     );
   }
 
-  // Pre-generate UUID for immediate image uploads
   const productId = crypto.randomUUID();
 
-  const supabase = await createClient();
-  const { data: categoriesData } = await supabase
-    .from("categories")
-    .select("*")
-    .eq("store_id", store.id)
-    .order("name", { ascending: true });
+  const db = getDb();
+  const res = await db
+    .prepare("SELECT * FROM categories WHERE store_id = ? ORDER BY name ASC")
+    .bind(store.id)
+    .all<Record<string, unknown>>();
 
-  const categories = categoriesData || [];
+  const categories: Category[] = (res.results || []).map((cat) => ({
+    id: String(cat.id),
+    store_id: String(cat.store_id),
+    name: String(cat.name),
+    slug: String(cat.slug),
+    description: cat.description ? String(cat.description) : null,
+    image_path: cat.image_path ? String(cat.image_path) : null,
+    sort_order: Number(cat.sort_order ?? 0),
+    active: Boolean(cat.active),
+    created_at: String(cat.created_at),
+    updated_at: String(cat.updated_at),
+  }));
 
   return (
     <div className="space-y-6">

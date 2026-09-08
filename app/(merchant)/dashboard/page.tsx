@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/features/auth/service";
 import { getStoreByOwner } from "@/features/store/service";
-import { createClient } from "@/lib/supabase/server";
+import { getDb } from "@/lib/db";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ShoppingBag, FolderTree, ExternalLink, Plus } from "lucide-react";
 
@@ -21,23 +21,22 @@ export default async function DashboardPage() {
     );
   }
 
-  const supabase = await createClient();
+  const db = getDb();
 
-  // Fetch real count of total active catalog products
-  const { count: productCount } = await supabase
-    .from("products")
-    .select("*", { count: "exact", head: true })
-    .eq("store_id", store.id)
-    .is("deleted_at", null);
+  // Fetch count of total active catalog products in D1
+  const prodRow = await db
+    .prepare("SELECT COUNT(*) as count FROM products WHERE store_id = ? AND deleted_at IS NULL")
+    .bind(store.id)
+    .first<{ count: number }>();
 
-  // Fetch real count of store categories
-  const { count: categoryCount } = await supabase
-    .from("categories")
-    .select("*", { count: "exact", head: true })
-    .eq("store_id", store.id);
+  // Fetch count of store categories in D1
+  const catRow = await db
+    .prepare("SELECT COUNT(*) as count FROM categories WHERE store_id = ?")
+    .bind(store.id)
+    .first<{ count: number }>();
 
-  const totalProducts = productCount ?? 0;
-  const totalCategories = categoryCount ?? 0;
+  const totalProducts = prodRow ? Number(prodRow.count) : 0;
+  const totalCategories = catRow ? Number(catRow.count) : 0;
 
   return (
     <div className="space-y-8">

@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { getMerchantProfile, getMerchantStore } from "@/features/auth/service";
+import { getCurrentUser, getMerchantProfile, getMerchantStore } from "@/features/auth/service";
 import { MerchantProvider } from "@/context/merchant-context";
 import { Sidebar } from "@/components/merchant/sidebar";
 import { Header } from "@/components/merchant/header";
@@ -10,10 +9,7 @@ export default async function MerchantLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     redirect("/login");

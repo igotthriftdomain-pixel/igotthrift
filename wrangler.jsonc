@@ -1,0 +1,37 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "igotthrift",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2024-09-23",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "workers_dev": true,
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "routes": [
+    { "pattern": "igotthrift.in", "custom_domain": true },
+    { "pattern": "www.igotthrift.in", "custom_domain": true },
+    { "pattern": "admin.igotthrift.in", "custom_domain": true }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "igotthrift-db",
+      "database_id": "0d01bcf7-3cb7-495f-9eb1-ca63b6523208",
+      "migrations_dir": "d1/migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "STORE_ASSETS",
+      "bucket_name": "igotthrift-media"
+    }
+  ],
+  "vars": {
+    "NEXT_PUBLIC_R2_PUBLIC_URL": "https://assets.igotthrift.in",
+    "NEXT_PUBLIC_DEFAULT_STORE_SLUG": "igotthrift"
+  }
+}

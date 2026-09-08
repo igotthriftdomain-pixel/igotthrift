@@ -1,33 +1,33 @@
-import { createClient } from "@/lib/supabase/server";
+import { getCurrentUser as getAuthUser } from "@/lib/auth";
+import { getDb } from "@/lib/db";
 import { type Profile, type Store } from "./types";
 
 export async function getCurrentUser() {
-  const supabase = await createClient();
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error || !user) return null;
-  return user;
+  return getAuthUser();
 }
 
 export async function getMerchantProfile(userId: string): Promise<Profile | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", userId)
-    .single();
+  const db = getDb();
+  const profile = await db
+    .prepare("SELECT id, email, created_at, updated_at FROM profiles WHERE id = ?")
+    .bind(userId)
+    .first<Profile>();
 
-  if (error || !data) return null;
-  return data as Profile;
+  if (!profile) return null;
+  return profile;
 }
 
 export async function getMerchantStore(userId: string): Promise<Store | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("stores")
-    .select("*")
-    .eq("owner_id", userId)
-    .single();
+  const db = getDb();
+  const store = await db
+    .prepare("SELECT * FROM stores WHERE owner_id = ?")
+    .bind(userId)
+    .first<Record<string, unknown>>();
 
-  if (error || !data) return null;
-  return data as Store;
+  if (!store) return null;
+
+  return {
+    ...store,
+    active: Boolean(store.active),
+  } as unknown as Store;
 }

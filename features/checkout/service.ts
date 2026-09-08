@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { getDb } from "@/lib/db";
 import { type CartItem } from "../storefront/context/cart-context";
 import { type CheckoutDetails } from "./types";
 
@@ -10,38 +10,50 @@ export async function verifyStockAndPrices(
   recalculatedSubtotal?: number;
   error?: string;
 }> {
-  const supabase = await createClient();
+  if (!items || items.length === 0) {
+    return { success: false, error: "Cart is empty." };
+  }
+
+  const db = getDb();
   const productIds = items.map((item) => item.id);
+  const placeholders = productIds.map(() => "?").join(",");
 
-  const { data: dbProducts, error } = await supabase
-    .from("products")
-    .select("id, price, stock, active, deleted_at, published_at")
-    .in("id", productIds)
-    .eq("store_id", storeId);
+  const res = await db
+    .prepare(
+      `SELECT id, price, stock_quantity, active, deleted_at, published_at
+       FROM products
+       WHERE id IN (${placeholders}) AND store_id = ?`
+    )
+    .bind(...productIds, storeId)
+    .all<Record<string, unknown>>();
 
-  if (error || !dbProducts || dbProducts.length !== items.length) {
+  const dbProducts = res.results || [];
+  if (dbProducts.length !== items.length) {
     return { success: false, error: "One or more products in your cart are no longer available." };
   }
 
   let recalculatedSubtotal = 0;
+  const nowIso = new Date().toISOString();
 
   for (const item of items) {
-    const dbProduct = dbProducts.find((p) => p.id === item.id);
+    const dbProduct = dbProducts.find((p) => String(p.id) === item.id);
     if (!dbProduct) {
       return { success: false, error: `Product "${item.name}" not found.` };
     }
 
-    const isPublished = !dbProduct.published_at || new Date(dbProduct.published_at) <= new Date();
-    if (!dbProduct.active || dbProduct.deleted_at !== null || !isPublished) {
+    const isPublished =
+      !dbProduct.published_at || String(dbProduct.published_at) <= nowIso;
+
+    if (!Boolean(dbProduct.active) || dbProduct.deleted_at !== null || !isPublished) {
       return { success: false, error: `Product "${item.name}" is no longer available.` };
     }
 
-    const availableStock = dbProduct.stock ?? 0;
+    const availableStock = Number(dbProduct.stock_quantity ?? 0);
     if (availableStock <= 0) {
       return { success: false, error: `Product "${item.name}" is currently Sold Out and no longer available.` };
     }
 
-    recalculatedSubtotal += dbProduct.price;
+    recalculatedSubtotal += Number(dbProduct.price ?? 0);
   }
 
   return { success: true, recalculatedSubtotal };
@@ -53,26 +65,32 @@ export async function createOrderRecord(
   items: CartItem[],
   totalAmount: number
 ): Promise<{ success: boolean; orderId?: string; error?: string }> {
-  const supabase = await createClient();
+  const db = getDb();
+  const orderId = crypto.randomUUID();
+  const cartSnapshotJson = JSON.stringify(items);
 
-  const { data, error } = await supabase
-    .from("orders")
-    .insert({
-      store_id: storeId,
-      customer_name: details.name,
-      customer_phone: details.phone,
-      customer_address: details.address,
-      cart_snapshot: items,
-      total_amount: totalAmount,
-      status: "pending",
-    })
-    .select("id")
-    .maybeSingle();
+  try {
+    await db
+      .prepare(
+        `INSERT INTO orders (
+          id, store_id, customer_name, customer_phone, customer_address,
+          cart_snapshot, total_amount, status, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', datetime('now'), datetime('now'))`
+      )
+      .bind(
+        orderId,
+        storeId,
+        details.name.trim(),
+        details.phone.trim(),
+        details.address.trim(),
+        cartSnapshotJson,
+        totalAmount
+      )
+      .run();
 
-  if (error || !data) {
-    console.error("Order insertion failed:", error);
+    return { success: true, orderId };
+  } catch (err) {
+    console.error("Order insertion failed:", err);
     return { success: false, error: "Failed to log checkout order. Try again." };
   }
-
-  return { success: true, orderId: data.id };
 }

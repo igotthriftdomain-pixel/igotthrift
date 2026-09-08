@@ -2,9 +2,9 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/features/auth/service";
 import { getStoreByOwner } from "@/features/store/service";
 import { getProducts } from "@/features/products/service";
-
 import { ProductsView } from "@/features/products/components/products-view";
-import { createClient } from "@/lib/supabase/server";
+import { getDb } from "@/lib/db";
+import { type Category } from "@/features/categories/types";
 
 interface PageProps {
   searchParams: Promise<{
@@ -49,28 +49,24 @@ export default async function ProductsPage({ searchParams }: PageProps) {
     page,
   });
 
-  // Fetch all categories for filtering dropdown options
-  // Use page=1 and a very large page limit by bypassing pagination if we can, 
-  // or fetch them with a large page query. Since getCategories uses ITEMS_PER_PAGE (10),
-  // let's fetch a list of categories without bounds or let's create a getCategoriesList helper in service.
-  // Wait, let's fetch using a simple query in Supabase directly, or add a helper.
-  // Since we already have the categories service, we can fetch all categories directly.
-  // Let's check how getCategories is implemented. It uses range(0, 9).
-  // Let's create a custom select query on categories to bypass pagination bounds for the dropdown,
-  // keeping the code modular and clean. We can query directly here or add a service method.
-  // Let's query directly using supabase server client to avoid duplicating methods.
-  // Wait, service query is better to avoid direct database calls in route files.
-  // Let's add a helper `getAllCategories(storeId)` inside features/categories/service.ts!
-  // Oh, wait, we don't have to edit categories/service if we can query it safely.
-  // Let's check: does getCategories allow fetching all categories? No, it has pagination.
-  const supabase = await createClient();
-  const { data: categoriesData } = await supabase
-    .from("categories")
-    .select("*")
-    .eq("store_id", store.id)
-    .order("name", { ascending: true });
+  const db = getDb();
+  const res = await db
+    .prepare("SELECT * FROM categories WHERE store_id = ? ORDER BY name ASC")
+    .bind(store.id)
+    .all<Record<string, unknown>>();
 
-  const categories = categoriesData || [];
+  const categories: Category[] = (res.results || []).map((cat) => ({
+    id: String(cat.id),
+    store_id: String(cat.store_id),
+    name: String(cat.name),
+    slug: String(cat.slug),
+    description: cat.description ? String(cat.description) : null,
+    image_path: cat.image_path ? String(cat.image_path) : null,
+    sort_order: Number(cat.sort_order ?? 0),
+    active: Boolean(cat.active),
+    created_at: String(cat.created_at),
+    updated_at: String(cat.updated_at),
+  }));
 
   return (
     <div className="space-y-6">
