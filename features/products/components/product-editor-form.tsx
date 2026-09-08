@@ -355,6 +355,13 @@ export function ProductEditorForm({
       uploading: true,
     };
 
+    setErrors((prev) => {
+      if (!prev.images) return prev;
+      const next = { ...prev };
+      delete next.images;
+      return next;
+    });
+
     setImages((prev) => [...prev, tempImage]);
 
     const formData = new FormData();
@@ -377,6 +384,12 @@ export function ProductEditorForm({
               : img
           )
         );
+        setErrors((prev) => {
+          if (!prev.images) return prev;
+          const next = { ...prev };
+          delete next.images;
+          return next;
+        });
         toast.success("Image uploaded successfully");
       } else {
         setImages((prev) => prev.filter((_, idx) => idx !== newIndex));
@@ -453,10 +466,18 @@ export function ProductEditorForm({
     if (file) handleImageUpload(file);
   };
 
+  const isUploadingImages = images.some((img) => img.uploading);
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     setErrors({});
+
+    if (isUploadingImages) {
+      toast.error("Please wait for all image uploads to complete before saving.");
+      setSaving(false);
+      return;
+    }
 
     const formattedPrice = Number(price);
     const formattedComparePrice = compareAtPrice ? Number(compareAtPrice) : null;
@@ -581,10 +602,10 @@ export function ProductEditorForm({
           <Button
             type="submit"
             form="product-editor-form"
-            disabled={saving || !isDirty}
+            disabled={saving || !isDirty || isUploadingImages}
             className="bg-zinc-900 hover:bg-zinc-800 text-zinc-50 dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:text-zinc-950 font-semibold px-5 h-9 text-xs"
           >
-            {saving ? "Saving Changes..." : isEditing ? "Save Changes" : "Create Product"}
+            {saving ? "Saving Changes..." : isUploadingImages ? "Uploading Image..." : isEditing ? "Save Changes" : "Create Product"}
           </Button>
         </div>
       </div>
@@ -873,10 +894,10 @@ export function ProductEditorForm({
               </Button>
               <Button
                 type="submit"
-                disabled={saving || !isDirty}
+                disabled={saving || !isDirty || isUploadingImages}
                 className="bg-zinc-900 hover:bg-zinc-800 text-zinc-50 dark:bg-zinc-50 dark:hover:bg-zinc-200 dark:text-zinc-950 font-semibold px-6"
               >
-                {saving ? "Saving Changes..." : isEditing ? "Save Changes" : "Create Product"}
+                {saving ? "Saving Changes..." : isUploadingImages ? "Uploading Image..." : isEditing ? "Save Changes" : "Create Product"}
               </Button>
             </div>
           </form>
