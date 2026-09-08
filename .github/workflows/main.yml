@@ -30,8 +30,8 @@ jobs:
         run: npm run lint
 
       - name: Build OpenNext
-        run: npx @opennextjs/cloudflare
-
+        run: npx @opennextjs/cloudflare build
+        
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
         with:
